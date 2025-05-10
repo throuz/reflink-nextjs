@@ -3,141 +3,138 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useProgram } from "@/components/counter/hooks/useProgram";
+import { useToast } from "@/components/counter/hooks/useToast";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor";
 
 export default function NewCampaignPage() {
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
+  const { connected, publicKey } = useWallet();
+  const { program } = useProgram();
+  const { showSuccessToast, showErrorToast } = useToast();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    commission: 5, // Default 5%
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsConfirmOpen(true);
-  };
+    if (!program || !publicKey) return;
 
-  const handleConfirm = async () => {
-    setIsCreating(true);
     try {
-      // Create campaign logic would go here
+      const [merchantPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("merchant"), publicKey.toBuffer()],
+        program.programId
+      );
 
-      // Redirect to campaign details page
-      window.location.href = "/dashboard";
+      // Register as a merchant with the specified commission rate
+      const tx = await program.methods
+        .registerMerchant(new anchor.BN(formData.commission * 100)) // Convert to basis points
+        .accounts({
+          merchant: merchantPda,
+          authority: publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+
+      showSuccessToast("Campaign created successfully!", tx);
+      router.push("/campaigns");
     } catch (error) {
-      console.error("Error creating campaign:", error);
-    } finally {
-      setIsCreating(false);
-      setIsConfirmOpen(false);
+      showErrorToast(
+        "Failed to create campaign",
+        error instanceof Error ? error : undefined
+      );
+      console.error(error);
     }
   };
 
+  if (!connected) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
+          <p>Please connect your wallet to create a campaign.</p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-3xl mx-auto py-12">
-      <Button
-        variant="ghost"
-        className="mb-8"
-        onClick={() => (window.location.href = "/dashboard")}
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Dashboard
-      </Button>
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <Button variant="ghost" asChild>
+          <Link href="/campaigns">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Campaigns
+          </Link>
+        </Button>
+      </div>
 
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Create New Campaign</h2>
+      <h1 className="text-3xl font-bold mb-8">Create New Campaign</h1>
 
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="name">Campaign Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter a name for your campaign"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="url">Target URL</Label>
-              <Input
-                id="url"
-                type="url"
-                placeholder="https://your-product.com"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="payout">Payout per Conversion (SOL)</Label>
-              <Input
-                id="payout"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.1"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="budget">Campaign Budget (SOL)</Label>
-              <Input
-                id="budget"
-                type="number"
-                step="0.1"
-                min="0"
-                placeholder="1.0"
-                required
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-indigo-500 hover:bg-indigo-600"
-              disabled={isCreating}
-            >
-              {isCreating ? "Creating..." : "Create Campaign"}
-            </Button>
+      <Card className="max-w-2xl mx-auto p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <Label htmlFor="name">Campaign Name</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
+              placeholder="Enter campaign name"
+              required
+            />
           </div>
+
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Input
+              id="description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              placeholder="Describe your campaign"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="commission">Commission Rate (%)</Label>
+            <Input
+              id="commission"
+              type="number"
+              min="0"
+              max="100"
+              value={formData.commission}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  commission: Number(e.target.value),
+                }))
+              }
+              required
+            />
+          </div>
+
+          <Button type="submit" className="w-full">
+            Create Campaign
+          </Button>
         </form>
       </Card>
-
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Campaign Creation</DialogTitle>
-            <DialogDescription>
-              This will create a new campaign and transfer the budget amount to
-              the campaign vault. The funds will be used to pay affiliates when
-              conversions occur.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsConfirmOpen(false)}
-              disabled={isCreating}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              className="bg-indigo-500 hover:bg-indigo-600"
-              disabled={isCreating}
-            >
-              {isCreating ? "Creating..." : "Confirm & Create"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
