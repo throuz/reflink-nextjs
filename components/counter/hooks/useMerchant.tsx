@@ -1,8 +1,9 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Program, AnchorProvider } from "@project-serum/anchor";
 import { useEffect, useState } from "react";
-import { IDL } from "@/anchor-idl/idl";
-import { RefLink } from "@/anchor-idl/idl";
+
+import { PublicKey } from "@solana/web3.js";
+import { useWallet } from "@solana/wallet-adapter-react";
+
+import { useProgram } from "./useProgram";
 
 export function useMerchant() {
   const { program } = useProgram();

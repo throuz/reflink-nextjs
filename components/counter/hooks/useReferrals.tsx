@@ -1,8 +1,10 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Program, AnchorProvider } from "@project-serum/anchor";
 import { useEffect, useState } from "react";
-import { useProgram } from "./useProgram";
+
+import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
+import { useWallet } from "@solana/wallet-adapter-react";
+
+import { useProgram } from "./useProgram";
 
 export function useReferrals() {
   const { program } = useProgram();
