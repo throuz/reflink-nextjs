@@ -1,7 +1,10 @@
 "use client";
 
-import * as anchor from "@coral-xyz/anchor";
+import { useEffect } from "react";
 
+import Idl from "@/anchor-idl/idl.json";
+import { Reflink } from "@/anchor-idl/idl";
+import * as anchor from "@coral-xyz/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import {
   useAnchorWallet,
@@ -9,22 +12,16 @@ import {
   useWallet,
 } from "@solana/wallet-adapter-react";
 
-import { Counter } from "@/anchor-idl/idl";
-import Idl from "@/anchor-idl/idl.json";
-import { useEffect } from "react";
-
 interface UseProgramReturn {
-  program: anchor.Program<Counter>;
-  counterAddress: PublicKey;
+  program: anchor.Program<Reflink>;
   publicKey: PublicKey | null;
   connected: boolean;
   connection: anchor.web3.Connection;
 }
 
 /**
- * A hook that provides access to the Solana program, counter address,
- * connected wallet, and connection.
- * This hook handles the basic setup for the program.
+ * A hook that provides access to the Solana program, wallet connection and status.
+ * This hook handles the basic setup for the Reflink program.
  */
 export function useProgram(): UseProgramReturn {
   const { publicKey, connected } = useWallet();
@@ -38,17 +35,11 @@ export function useProgram(): UseProgramReturn {
     const provider = new anchor.AnchorProvider(connection, wallet, {
       preflightCommitment: "confirmed",
     });
-    program = new anchor.Program<Counter>(Idl, provider);
+    program = new anchor.Program<Reflink>(Idl, provider);
   } else {
     // Create program with just connection for read-only operations
-    program = new anchor.Program<Counter>(Idl, { connection });
+    program = new anchor.Program<Reflink>(Idl, { connection });
   }
-
-  // Get the counter account address
-  const counterAddress = PublicKey.findProgramAddressSync(
-    [Buffer.from("counter")],
-    new PublicKey(Idl.address)
-  )[0];
 
   // Fund connected wallet with devnet SOL
   useEffect(() => {
@@ -68,11 +59,10 @@ export function useProgram(): UseProgramReturn {
     };
 
     airdropDevnetSol();
-  }, [publicKey]);
+  }, [publicKey, connection]);
 
   return {
     program,
-    counterAddress,
     publicKey,
     connected,
     connection,

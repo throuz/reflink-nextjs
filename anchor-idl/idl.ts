@@ -2,53 +2,41 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/counter.json`.
+ * IDL can be found at `target/idl/reflink.json`.
  */
-export type Counter = {
-  address: "8PY1q5J3Aq2z7TBDLBrVjv77mYzjXSCz6iHQaFEFw9hY";
+export type Reflink = {
+  address: "2BkHiWJxLd91RWQWWcr97ggCsdA3PY1MTRoC9AJuZad9";
   metadata: {
-    name: "counter";
+    name: "reflink";
     version: "0.1.0";
     spec: "0.1.0";
     description: "Created with Anchor";
   };
   instructions: [
     {
-      name: "decrement";
-      discriminator: [106, 227, 168, 59, 248, 27, 150, 101];
+      name: "registerAffiliate";
+      discriminator: [87, 121, 99, 184, 126, 63, 103, 217];
       accounts: [
         {
-          name: "user";
-          writable: true;
-          signer: true;
-        },
-        {
-          name: "counter";
+          name: "affiliate";
           writable: true;
           pda: {
             seeds: [
               {
                 kind: "const";
-                value: [99, 111, 117, 110, 116, 101, 114];
-              }
-            ];
-          };
-        },
-        {
-          name: "vault";
-          writable: true;
-          pda: {
-            seeds: [
-              {
-                kind: "const";
-                value: [118, 97, 117, 108, 116];
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
               },
               {
                 kind: "account";
-                path: "user";
+                path: "authority";
               }
             ];
           };
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
         },
         {
           name: "systemProgram";
@@ -58,72 +46,415 @@ export type Counter = {
       args: [];
     },
     {
-      name: "increment";
-      discriminator: [11, 18, 104, 9, 104, 174, 59, 33];
+      name: "registerMerchant";
+      discriminator: [238, 245, 77, 132, 161, 88, 216, 248];
       accounts: [
         {
-          name: "user";
-          writable: true;
-          signer: true;
-        },
-        {
-          name: "counter";
+          name: "merchant";
           writable: true;
           pda: {
             seeds: [
               {
                 kind: "const";
-                value: [99, 111, 117, 110, 116, 101, 114];
-              }
-            ];
-          };
-        },
-        {
-          name: "vault";
-          writable: true;
-          pda: {
-            seeds: [
-              {
-                kind: "const";
-                value: [118, 97, 117, 108, 116];
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
               },
               {
                 kind: "account";
-                path: "user";
+                path: "authority";
               }
             ];
           };
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
         },
         {
           name: "systemProgram";
           address: "11111111111111111111111111111111";
         }
       ];
+      args: [
+        {
+          name: "commissionBps";
+          type: "u16";
+        }
+      ];
+    },
+    {
+      name: "registerReferralSol";
+      discriminator: [42, 231, 92, 85, 242, 38, 111, 91];
+      accounts: [
+        {
+          name: "affiliate";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
+              },
+              {
+                kind: "account";
+                path: "affiliate.authority";
+                account: "affiliate";
+              }
+            ];
+          };
+        },
+        {
+          name: "referral";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [114, 101, 102, 101, 114, 114, 97, 108];
+              },
+              {
+                kind: "account";
+                path: "affiliate";
+              },
+              {
+                kind: "account";
+                path: "merchant";
+              },
+              {
+                kind: "account";
+                path: "affiliate.total_referrals";
+                account: "affiliate";
+              }
+            ];
+          };
+        },
+        {
+          name: "merchant";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "merchant.authority";
+                account: "merchant";
+              }
+            ];
+          };
+        },
+        {
+          name: "merchantWallet";
+          docs: [
+            "The wallet that will receive the merchant's portion of the payment",
+            "This should be the merchant's authority wallet or another designated wallet"
+          ];
+          writable: true;
+        },
+        {
+          name: "affiliateWallet";
+          docs: [
+            "The wallet that will receive the affiliate's commission",
+            "This should be the affiliate's authority wallet or another designated wallet"
+          ];
+          writable: true;
+        },
+        {
+          name: "payer";
+          docs: ["The wallet that is making the payment"];
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        }
+      ];
+      args: [
+        {
+          name: "amount";
+          type: "u64";
+        }
+      ];
+    },
+    {
+      name: "registerReferralToken";
+      discriminator: [50, 215, 2, 53, 56, 216, 151, 55];
+      accounts: [
+        {
+          name: "affiliate";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
+              },
+              {
+                kind: "account";
+                path: "affiliate.authority";
+                account: "affiliate";
+              }
+            ];
+          };
+        },
+        {
+          name: "referral";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [114, 101, 102, 101, 114, 114, 97, 108];
+              },
+              {
+                kind: "account";
+                path: "affiliate";
+              },
+              {
+                kind: "account";
+                path: "merchant";
+              },
+              {
+                kind: "account";
+                path: "affiliate.total_referrals";
+                account: "affiliate";
+              }
+            ];
+          };
+        },
+        {
+          name: "merchant";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "merchant.authority";
+                account: "merchant";
+              }
+            ];
+          };
+        },
+        {
+          name: "tokenMint";
+          docs: ["The token mint being used for payment"];
+        },
+        {
+          name: "merchantTokenAccount";
+          docs: ["The merchant's token account that will receive payment"];
+          writable: true;
+        },
+        {
+          name: "affiliateTokenAccount";
+          docs: ["The affiliate's token account that will receive commission"];
+          writable: true;
+        },
+        {
+          name: "payerTokenAccount";
+          docs: ["The payer's token account"];
+          writable: true;
+        },
+        {
+          name: "payer";
+          docs: ["The wallet that is making the payment"];
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "tokenProgram";
+          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        }
+      ];
+      args: [
+        {
+          name: "amount";
+          type: "u64";
+        }
+      ];
+    },
+    {
+      name: "toggleMerchantStatus";
+      discriminator: [251, 186, 166, 45, 108, 107, 186, 170];
+      accounts: [
+        {
+          name: "merchant";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "authority";
+              }
+            ];
+          };
+        },
+        {
+          name: "authority";
+          signer: true;
+        }
+      ];
       args: [];
+    },
+    {
+      name: "updateMerchantCommission";
+      discriminator: [77, 99, 119, 206, 140, 212, 161, 195];
+      accounts: [
+        {
+          name: "merchant";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "authority";
+              }
+            ];
+          };
+        },
+        {
+          name: "authority";
+          signer: true;
+        }
+      ];
+      args: [
+        {
+          name: "newCommissionBps";
+          type: "u16";
+        }
+      ];
     }
   ];
   accounts: [
     {
-      name: "counter";
-      discriminator: [255, 176, 4, 245, 188, 253, 124, 25];
+      name: "affiliate";
+      discriminator: [136, 95, 107, 149, 36, 195, 146, 35];
+    },
+    {
+      name: "merchant";
+      discriminator: [71, 235, 30, 40, 231, 21, 32, 64];
+    },
+    {
+      name: "referral";
+      discriminator: [30, 235, 136, 224, 106, 107, 49, 64];
     }
   ];
   errors: [
     {
       code: 6000;
-      name: "underflowError";
-      msg: "Counter cannot be decremented below zero";
+      name: "invalidCommissionRate";
+      msg: "Invalid commission rate.";
+    },
+    {
+      code: 6001;
+      name: "unauthorized";
+      msg: "Unauthorized.";
+    },
+    {
+      code: 6002;
+      name: "invalidAffiliate";
+      msg: "Invalid affiliate.";
+    },
+    {
+      code: 6003;
+      name: "calculationError";
+      msg: "Calculation error.";
+    },
+    {
+      code: 6004;
+      name: "inactiveMerchant";
+      msg: "Merchant is not active.";
     }
   ];
   types: [
     {
-      name: "counter";
+      name: "affiliate";
       type: {
         kind: "struct";
         fields: [
           {
-            name: "count";
+            name: "authority";
+            type: "pubkey";
+          },
+          {
+            name: "totalEarned";
             type: "u64";
+          },
+          {
+            name: "totalReferrals";
+            type: "u64";
+          }
+        ];
+      };
+    },
+    {
+      name: "merchant";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "authority";
+            type: "pubkey";
+          },
+          {
+            name: "commissionBps";
+            type: "u16";
+          },
+          {
+            name: "active";
+            type: "bool";
+          }
+        ];
+      };
+    },
+    {
+      name: "referral";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "affiliate";
+            type: "pubkey";
+          },
+          {
+            name: "merchant";
+            type: "pubkey";
+          },
+          {
+            name: "amount";
+            type: "u64";
+          },
+          {
+            name: "commission";
+            type: "u64";
+          },
+          {
+            name: "timestamp";
+            type: "i64";
+          },
+          {
+            name: "isToken";
+            type: "bool";
+          },
+          {
+            name: "tokenMint";
+            type: "pubkey";
           }
         ];
       };
