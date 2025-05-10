@@ -4,17 +4,24 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProgram } from "@/components/counter/hooks/useProgram";
-import { useToast } from "@/components/counter/hooks/useToast";
+import { useTransactionToast } from "@/components/counter/hooks/useTransactionToast";
 import { StatsCard } from "@/components/counter/StatsCard";
 import { useState, useEffect } from "react";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { toast } from "sonner";
 
 export default function AffiliateDashboard() {
   const { connected, publicKey } = useWallet();
   const { program } = useProgram();
-  const { showSuccessToast, showErrorToast } = useToast();
   const [affiliateData, setAffiliateData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [transactionSignature, setTransactionSignature] = useState<
+    string | null
+  >(null);
+
+  // Use transaction toast hook
+  useTransactionToast({ transactionSignature });
 
   useEffect(() => {
     if (!program || !publicKey) {
@@ -46,31 +53,44 @@ export default function AffiliateDashboard() {
     if (!program || !publicKey) return;
 
     try {
-      const [affiliatePda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("affiliate"), publicKey.toBuffer()],
-        program.programId
-      );
+      setIsRegistering(true);
 
-      const tx = await program.methods
+      // Send the transaction
+      const txSignature = await program.methods
         .registerAffiliate()
         .accounts({
-          affiliate: affiliatePda,
           authority: publicKey,
-          systemProgram: SystemProgram.programId,
         })
         .rpc();
 
-      showSuccessToast("Successfully registered as affiliate!", tx);
+      setTransactionSignature(txSignature);
 
-      // Refresh affiliate data
-      const affiliate = await program.account.affiliate.fetch(affiliatePda);
-      setAffiliateData(affiliate);
-    } catch (error) {
-      console.error(error);
-      showErrorToast(
-        "Failed to register as affiliate",
-        error instanceof Error ? error : undefined
-      );
+      // Refresh affiliate data after short delay to allow indexing
+      setTimeout(async () => {
+        try {
+          const [affiliatePda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("affiliate"), publicKey.toBuffer()],
+            program.programId
+          );
+          const affiliate = await program.account.affiliate.fetch(affiliatePda);
+          setAffiliateData(affiliate);
+        } catch (error) {
+          console.error("Error fetching updated affiliate data:", error);
+        }
+      }, 2000);
+    } catch (err) {
+      toast.error("Transaction Failed", {
+        description: `${err}`,
+        style: {
+          border: "1px solid rgba(239, 68, 68, 0.3)",
+          background:
+            "linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))",
+        },
+        duration: 5000,
+      });
+      console.error(err);
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -104,8 +124,19 @@ export default function AffiliateDashboard() {
             <p className="text-gray-500">
               Register to start earning commissions from merchant referrals.
             </p>
-            <Button onClick={handleRegisterAffiliate} className="w-full">
-              Register as Affiliate
+            <Button
+              onClick={handleRegisterAffiliate}
+              disabled={isRegistering}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            >
+              {isRegistering ? (
+                <div className="flex items-center justify-center">
+                  <div className="h-5 w-5 rounded-full border-2 border-purple-200/50 border-t-purple-200 animate-spin mr-2"></div>
+                  <span>Processing...</span>
+                </div>
+              ) : (
+                "Register as Affiliate"
+              )}
             </Button>
           </div>
         </Card>

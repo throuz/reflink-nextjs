@@ -9,17 +9,24 @@ import { useState, useEffect } from "react";
 import { useProgram } from "@/components/counter/hooks/useProgram";
 import { useTransactionToast } from "@/components/counter/hooks/useTransactionToast";
 import { StatsCard } from "@/components/counter/StatsCard";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
+import { toast } from "sonner";
 
 export default function MerchantDashboard() {
   const { connected, publicKey } = useWallet();
   const { program } = useProgram();
-  const { showSuccessToast, showErrorToast } = useTransactionToast();
   const [commissionRate, setCommissionRate] = useState<number>(5);
   const [isActive, setIsActive] = useState<boolean>(true);
   const [merchantData, setMerchantData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [transactionSignature, setTransactionSignature] = useState<
+    string | null
+  >(null);
+
+  // Use transaction toast hook
+  useTransactionToast({ transactionSignature });
 
   useEffect(() => {
     if (!program || !publicKey) {
@@ -53,28 +60,43 @@ export default function MerchantDashboard() {
     if (!program || !publicKey) return;
 
     try {
-      const [merchantPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("merchant"), publicKey.toBuffer()],
-        program.programId
-      );
+      setIsProcessing(true);
 
       const tx = await program.methods
-        .registerMerchant(commissionRate * 100)
+        .registerMerchant(new anchor.BN(commissionRate * 100))
         .accounts({
           authority: publicKey,
-          merchant: merchantPda,
-          systemProgram: anchor.web3.SystemProgram.programId,
         })
-        .instruction();
+        .rpc();
 
-      showSuccessToast("Successfully registered as a merchant!");
+      setTransactionSignature(tx);
 
-      // Refresh merchant data
-      const merchant = await program.account.merchant.fetch(merchantPda);
-      setMerchantData(merchant);
-    } catch (error) {
-      showErrorToast("Failed to register as merchant");
-      console.error(error);
+      // Refresh merchant data after short delay to allow indexing
+      setTimeout(async () => {
+        try {
+          const [merchantPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("merchant"), publicKey.toBuffer()],
+            program.programId
+          );
+          const merchant = await program.account.merchant.fetch(merchantPda);
+          setMerchantData(merchant);
+        } catch (error) {
+          console.error("Error fetching updated merchant data:", error);
+        }
+      }, 2000);
+    } catch (err) {
+      toast.error("Transaction Failed", {
+        description: `${err}`,
+        style: {
+          border: "1px solid rgba(239, 68, 68, 0.3)",
+          background:
+            "linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))",
+        },
+        duration: 5000,
+      });
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -82,27 +104,43 @@ export default function MerchantDashboard() {
     if (!program || !publicKey) return;
 
     try {
-      const [merchantPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("merchant"), publicKey.toBuffer()],
-        program.programId
-      );
+      setIsProcessing(true);
 
       const tx = await program.methods
-        .updateMerchantCommission(commissionRate * 100)
+        .updateMerchantCommission(new anchor.BN(commissionRate * 100))
         .accounts({
-          merchantAccount: merchantPda,
           authority: publicKey,
         })
         .rpc();
 
-      showSuccessToast("Successfully updated commission rate!");
+      setTransactionSignature(tx);
 
-      // Refresh merchant data
-      const merchant = await program.account.merchant.fetch(merchantPda);
-      setMerchantData(merchant);
-    } catch (error) {
-      showErrorToast("Failed to update commission rate");
-      console.error(error);
+      // Refresh merchant data after short delay to allow indexing
+      setTimeout(async () => {
+        try {
+          const [merchantPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("merchant"), publicKey.toBuffer()],
+            program.programId
+          );
+          const merchant = await program.account.merchant.fetch(merchantPda);
+          setMerchantData(merchant);
+        } catch (error) {
+          console.error("Error fetching updated merchant data:", error);
+        }
+      }, 2000);
+    } catch (err) {
+      toast.error("Transaction Failed", {
+        description: `${err}`,
+        style: {
+          border: "1px solid rgba(239, 68, 68, 0.3)",
+          background:
+            "linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))",
+        },
+        duration: 5000,
+      });
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -110,28 +148,47 @@ export default function MerchantDashboard() {
     if (!program || !publicKey) return;
 
     try {
-      const [merchantPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("merchant"), publicKey.toBuffer()],
-        program.programId
-      );
+      setIsProcessing(true);
 
       const tx = await program.methods
         .toggleMerchantStatus()
         .accounts({
-          merchantAccount: merchantPda,
           authority: publicKey,
         })
         .rpc();
 
-      setIsActive(!isActive);
-      showSuccessToast("Successfully toggled merchant status!");
+      setTransactionSignature(tx);
 
-      // Refresh merchant data
-      const merchant = await program.account.merchant.fetch(merchantPda);
-      setMerchantData(merchant);
-    } catch (error) {
-      showErrorToast("Failed to toggle status");
-      console.error(error);
+      // Toggle state optimistically but refresh from chain
+      setIsActive(!isActive);
+
+      // Refresh merchant data after short delay to allow indexing
+      setTimeout(async () => {
+        try {
+          const [merchantPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("merchant"), publicKey.toBuffer()],
+            program.programId
+          );
+          const merchant = await program.account.merchant.fetch(merchantPda);
+          setMerchantData(merchant);
+          setIsActive(merchant.active);
+        } catch (error) {
+          console.error("Error fetching updated merchant data:", error);
+        }
+      }, 2000);
+    } catch (err) {
+      toast.error("Transaction Failed", {
+        description: `${err}`,
+        style: {
+          border: "1px solid rgba(239, 68, 68, 0.3)",
+          background:
+            "linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))",
+        },
+        duration: 5000,
+      });
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -173,8 +230,19 @@ export default function MerchantDashboard() {
                 onChange={(e) => setCommissionRate(Number(e.target.value))}
               />
             </div>
-            <Button onClick={handleRegisterMerchant} className="w-full">
-              Register as Merchant
+            <Button
+              onClick={handleRegisterMerchant}
+              disabled={isProcessing}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            >
+              {isProcessing ? (
+                <div className="flex items-center justify-center">
+                  <div className="h-5 w-5 rounded-full border-2 border-purple-200/50 border-t-purple-200 animate-spin mr-2"></div>
+                  <span>Processing...</span>
+                </div>
+              ) : (
+                "Register as Merchant"
+              )}
             </Button>
           </div>
         </Card>
@@ -182,46 +250,62 @@ export default function MerchantDashboard() {
         <div className="grid gap-8 md:grid-cols-2">
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Merchant Settings</h2>
-
             <div className="space-y-4">
               <div>
-                <Label htmlFor="commission">Commission Rate (%)</Label>
-                <Input
-                  id="commission"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={commissionRate}
-                  onChange={(e) => setCommissionRate(Number(e.target.value))}
-                />
+                <Label htmlFor="commissionUpdate">Commission Rate (%)</Label>
+                <div className="flex gap-4">
+                  <Input
+                    id="commissionUpdate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={commissionRate}
+                    onChange={(e) => setCommissionRate(Number(e.target.value))}
+                  />
+                  <Button
+                    onClick={handleUpdateCommission}
+                    disabled={isProcessing}
+                    variant="secondary"
+                  >
+                    {isProcessing ? "Updating..." : "Update"}
+                  </Button>
+                </div>
               </div>
-
-              <Button onClick={handleUpdateCommission} className="w-full">
-                Update Commission Rate
-              </Button>
-
-              <Button
-                onClick={handleToggleStatus}
-                variant={isActive ? "destructive" : "default"}
-                className="w-full"
-              >
-                {isActive
-                  ? "Deactivate Merchant Account"
-                  : "Activate Merchant Account"}
-              </Button>
+              <div>
+                <Label>Account Status</Label>
+                <div className="flex items-center gap-4">
+                  <span
+                    className={`inline-block w-3 h-3 rounded-full ${
+                      isActive ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  ></span>
+                  <span>{isActive ? "Active" : "Inactive"}</span>
+                  <Button
+                    onClick={handleToggleStatus}
+                    disabled={isProcessing}
+                    variant="secondary"
+                  >
+                    {isProcessing
+                      ? "Processing..."
+                      : isActive
+                      ? "Deactivate"
+                      : "Activate"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </Card>
 
           <StatsCard
-            title="Merchant Statistics"
+            title="Performance"
             stats={[
               {
-                label: "Status",
-                value: isActive ? "Active" : "Inactive",
+                label: "Commission Rate",
+                value: `${merchantData.commissionBps / 100}%`,
               },
               {
-                label: "Current Commission",
-                value: `${commissionRate}%`,
+                label: "Status",
+                value: merchantData.active ? "Active" : "Inactive",
               },
             ]}
           />
