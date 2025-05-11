@@ -1,12 +1,24 @@
 "use client";
 
+import { ArrowRight, CheckCircle } from "lucide-react";
+
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { ArrowRight, CheckCircle } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 export default function Home() {
   const { connected } = useWallet();
+  const { setVisible } = useWalletModal();
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (!connected) {
+      setVisible(true);
+    } else {
+      router.push("/dashboard");
+    }
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -28,13 +40,9 @@ export default function Home() {
               <Button
                 size="lg"
                 className="bg-indigo-500 hover:bg-indigo-600"
-                onClick={() =>
-                  (window.location.href = connected
-                    ? "/dashboard"
-                    : "#get-started")
-                }
+                onClick={handleClick}
               >
-                Get Started
+                {connected ? "Go to Dashboard" : "Connect Wallet"}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
@@ -129,11 +137,7 @@ export default function Home() {
               <Button
                 size="lg"
                 className="bg-indigo-500 hover:bg-indigo-600"
-                onClick={() => {
-                  if (connected) {
-                    redirect("/dashboard");
-                  }
-                }}
+                onClick={handleClick}
               >
                 {connected ? "Go to Dashboard" : "Connect Wallet"}
                 <ArrowRight className="ml-2 h-5 w-5" />

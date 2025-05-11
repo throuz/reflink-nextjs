@@ -1,15 +1,15 @@
 "use client";
 
 import React, { FC, ReactNode, useMemo } from "react";
+
+import { clusterApiUrl } from "@solana/web3.js";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { clusterApiUrl } from "@solana/web3.js";
 
-// Import the wallet adapter styles
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 interface SolanaProviderProps {
