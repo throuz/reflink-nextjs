@@ -43,7 +43,10 @@ export default function MerchantDashboard() {
 
         const merchant = await program.account.merchant.fetch(merchantPda);
         setMerchantData(merchant);
-        setCommissionRate(merchant.commissionBps / 100);
+        // Only set commission rate if it hasn't been modified by user
+        if (!merchantData) {
+          setCommissionRate(merchant.commissionBps / 100);
+        }
         setIsActive(merchant.active);
       } catch (error) {
         console.error("Error fetching merchant data:", error);
