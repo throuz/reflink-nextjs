@@ -8,56 +8,30 @@
   },
   "instructions": [
     {
-      "name": "register_affiliate",
-      "discriminator": [87, 121, 99, 184, 126, 63, 103, 217],
+      "name": "create_affiliate_program",
+      "discriminator": [98, 186, 216, 40, 40, 253, 210, 236],
       "accounts": [
         {
-          "name": "affiliate",
+          "name": "affiliate_program",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
+                "value": [
+                  97, 102, 102, 105, 108, 105, 97, 116, 101, 95, 112, 114, 111,
+                  103, 114, 97, 109
+                ]
               },
               {
                 "kind": "account",
-                "path": "authority"
+                "path": "merchant"
               }
             ]
           }
         },
         {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "register_merchant",
-      "discriminator": [238, 245, 77, 132, 161, 88, 216, 248],
-      "accounts": [
-        {
-          "name": "merchant",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [109, 101, 114, 99, 104, 97, 110, 116]
-              },
-              {
-                "kind": "account",
-                "path": "authority"
-              }
-            ]
-          }
+          "name": "merchant"
         },
         {
           "name": "authority",
@@ -71,59 +45,22 @@
       ],
       "args": [
         {
-          "name": "commission_bps",
+          "name": "program_name",
+          "type": "string"
+        },
+        {
+          "name": "referrer_fee_basis_points",
           "type": "u16"
         }
       ]
     },
     {
-      "name": "register_referral_sol",
-      "discriminator": [42, 231, 92, 85, 242, 38, 111, 91],
+      "name": "create_merchant",
+      "discriminator": [249, 172, 245, 100, 32, 117, 97, 156],
       "accounts": [
         {
-          "name": "affiliate",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
-              },
-              {
-                "kind": "account",
-                "path": "affiliate.authority",
-                "account": "Affiliate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "referral",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [114, 101, 102, 101, 114, 114, 97, 108]
-              },
-              {
-                "kind": "account",
-                "path": "affiliate"
-              },
-              {
-                "kind": "account",
-                "path": "merchant"
-              },
-              {
-                "kind": "account",
-                "path": "affiliate.total_referrals",
-                "account": "Affiliate"
-              }
-            ]
-          }
-        },
-        {
           "name": "merchant",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -132,37 +69,163 @@
               },
               {
                 "kind": "account",
-                "path": "merchant.authority",
-                "account": "Merchant"
+                "path": "authority"
               }
             ]
           }
         },
         {
-          "name": "merchant_wallet",
-          "docs": [
-            "The wallet that will receive the merchant's portion of the payment",
-            "This should be the merchant's authority wallet or another designated wallet"
-          ],
-          "writable": true
-        },
-        {
-          "name": "affiliate_wallet",
-          "docs": [
-            "The wallet that will receive the affiliate's commission",
-            "This should be the affiliate's authority wallet or another designated wallet"
-          ],
-          "writable": true
-        },
-        {
-          "name": "payer",
-          "docs": ["The wallet that is making the payment"],
+          "name": "authority",
           "writable": true,
           "signer": true
         },
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "merchant_name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_referral_link",
+      "discriminator": [246, 55, 144, 190, 86, 38, 25, 213],
+      "accounts": [
+        {
+          "name": "referral_link",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114, 101, 102, 101, 114, 114, 97, 108, 95, 108, 105, 110, 107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "affiliate_program"
+              },
+              {
+                "kind": "account",
+                "path": "referrer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "affiliate_program"
+        },
+        {
+          "name": "referrer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "unique_code",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "increment_click",
+      "discriminator": [189, 6, 253, 63, 135, 146, 88, 65],
+      "accounts": [
+        {
+          "name": "referral_link",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_platform",
+      "discriminator": [119, 201, 101, 45, 75, 122, 89, 3],
+      "accounts": [
+        {
+          "name": "platform",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [112, 108, 97, 116, 102, 111, 114, 109]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "platform_fee_basis_points",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "process_sale",
+      "discriminator": [103, 228, 248, 104, 78, 46, 193, 82],
+      "accounts": [
+        {
+          "name": "platform"
+        },
+        {
+          "name": "merchant"
+        },
+        {
+          "name": "affiliate_program"
+        },
+        {
+          "name": "referral_link",
+          "writable": true
+        },
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "buyer_token_account",
+          "writable": true
+        },
+        {
+          "name": "merchant_token_account",
+          "writable": true
+        },
+        {
+          "name": "referrer_token_account",
+          "writable": true
+        },
+        {
+          "name": "platform_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
       "args": [
@@ -173,109 +236,22 @@
       ]
     },
     {
-      "name": "register_referral_token",
-      "discriminator": [50, 215, 2, 53, 56, 216, 151, 55],
+      "name": "toggle_affiliate_program_status",
+      "discriminator": [11, 194, 31, 217, 193, 188, 43, 239],
       "accounts": [
         {
-          "name": "affiliate",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
-              },
-              {
-                "kind": "account",
-                "path": "affiliate.authority",
-                "account": "Affiliate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "referral",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [114, 101, 102, 101, 114, 114, 97, 108]
-              },
-              {
-                "kind": "account",
-                "path": "affiliate"
-              },
-              {
-                "kind": "account",
-                "path": "merchant"
-              },
-              {
-                "kind": "account",
-                "path": "affiliate.total_referrals",
-                "account": "Affiliate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "merchant",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [109, 101, 114, 99, 104, 97, 110, 116]
-              },
-              {
-                "kind": "account",
-                "path": "merchant.authority",
-                "account": "Merchant"
-              }
-            ]
-          }
-        },
-        {
-          "name": "token_mint",
-          "docs": ["The token mint being used for payment"]
-        },
-        {
-          "name": "merchant_token_account",
-          "docs": ["The merchant's token account that will receive payment"],
+          "name": "affiliate_program",
           "writable": true
         },
         {
-          "name": "affiliate_token_account",
-          "docs": [
-            "The affiliate's token account that will receive commission"
-          ],
-          "writable": true
+          "name": "merchant"
         },
         {
-          "name": "payer_token_account",
-          "docs": ["The payer's token account"],
-          "writable": true
-        },
-        {
-          "name": "payer",
-          "docs": ["The wallet that is making the payment"],
-          "writable": true,
+          "name": "authority",
           "signer": true
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
+      "args": []
     },
     {
       "name": "toggle_merchant_status",
@@ -283,19 +259,7 @@
       "accounts": [
         {
           "name": "merchant",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [109, 101, 114, 99, 104, 97, 110, 116]
-              },
-              {
-                "kind": "account",
-                "path": "authority"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "authority",
@@ -305,24 +269,27 @@
       "args": []
     },
     {
-      "name": "update_merchant_commission",
-      "discriminator": [77, 99, 119, 206, 140, 212, 161, 195],
+      "name": "toggle_referral_link_status",
+      "discriminator": [26, 73, 35, 181, 45, 41, 160, 31],
       "accounts": [
         {
-          "name": "merchant",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [109, 101, 114, 99, 104, 97, 110, 116]
-              },
-              {
-                "kind": "account",
-                "path": "authority"
-              }
-            ]
-          }
+          "name": "referral_link",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_platform_fee",
+      "discriminator": [162, 97, 186, 47, 93, 113, 176, 243],
+      "accounts": [
+        {
+          "name": "platform",
+          "writable": true
         },
         {
           "name": "authority",
@@ -331,7 +298,7 @@
       ],
       "args": [
         {
-          "name": "new_commission_bps",
+          "name": "new_fee_basis_points",
           "type": "u16"
         }
       ]
@@ -339,62 +306,114 @@
   ],
   "accounts": [
     {
-      "name": "Affiliate",
-      "discriminator": [136, 95, 107, 149, 36, 195, 146, 35]
+      "name": "AffiliateProgram",
+      "discriminator": [101, 106, 6, 88, 121, 237, 223, 54]
     },
     {
       "name": "Merchant",
       "discriminator": [71, 235, 30, 40, 231, 21, 32, 64]
     },
     {
-      "name": "Referral",
-      "discriminator": [30, 235, 136, 224, 106, 107, 49, 64]
+      "name": "Platform",
+      "discriminator": [77, 92, 204, 58, 187, 98, 91, 12]
+    },
+    {
+      "name": "ReferralLink",
+      "discriminator": [30, 231, 159, 98, 189, 47, 48, 5]
     }
   ],
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidCommissionRate",
-      "msg": "Invalid commission rate."
+      "name": "InvalidFeeBasisPoints",
+      "msg": "Fee basis points must be <= 10000"
     },
     {
       "code": 6001,
-      "name": "Unauthorized",
-      "msg": "Unauthorized."
+      "name": "NameTooLong",
+      "msg": "Name too long"
     },
     {
       "code": 6002,
-      "name": "InvalidAffiliate",
-      "msg": "Invalid affiliate."
+      "name": "RefCodeTooLong",
+      "msg": "Referral code too long"
     },
     {
       "code": 6003,
-      "name": "CalculationError",
-      "msg": "Calculation error."
+      "name": "InvalidAmount",
+      "msg": "Invalid amount"
     },
     {
       "code": 6004,
+      "name": "NotPlatformAuthority",
+      "msg": "Not platform authority"
+    },
+    {
+      "code": 6005,
+      "name": "NotMerchantAuthority",
+      "msg": "Not merchant authority"
+    },
+    {
+      "code": 6006,
+      "name": "NotReferrer",
+      "msg": "Not referrer"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidAffiliateProgramMerchant",
+      "msg": "Invalid affiliate program merchant"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidReferralLinkAffiliateProgram",
+      "msg": "Invalid referral link affiliate program"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidOwner",
+      "msg": "Invalid token account owner"
+    },
+    {
+      "code": 6010,
       "name": "InactiveMerchant",
-      "msg": "Merchant is not active."
+      "msg": "Merchant is inactive"
+    },
+    {
+      "code": 6011,
+      "name": "InactiveAffiliateProgram",
+      "msg": "Affiliate program is inactive"
+    },
+    {
+      "code": 6012,
+      "name": "InactiveReferralLink",
+      "msg": "Referral link is inactive"
     }
   ],
   "types": [
     {
-      "name": "Affiliate",
+      "name": "AffiliateProgram",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "authority",
+            "name": "merchant",
             "type": "pubkey"
           },
           {
-            "name": "total_earned",
-            "type": "u64"
+            "name": "name",
+            "type": "string"
           },
           {
-            "name": "total_referrals",
-            "type": "u64"
+            "name": "referrer_fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -409,48 +428,80 @@
             "type": "pubkey"
           },
           {
-            "name": "commission_bps",
-            "type": "u16"
+            "name": "name",
+            "type": "string"
           },
           {
-            "name": "active",
+            "name": "is_active",
             "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "Referral",
+      "name": "Platform",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "affiliate",
+            "name": "authority",
             "type": "pubkey"
           },
           {
-            "name": "merchant",
+            "name": "fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReferralLink",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "affiliate_program",
             "type": "pubkey"
           },
           {
-            "name": "amount",
+            "name": "referrer",
+            "type": "pubkey"
+          },
+          {
+            "name": "code",
+            "type": "string"
+          },
+          {
+            "name": "click_count",
             "type": "u64"
           },
           {
-            "name": "commission",
+            "name": "conversion_count",
             "type": "u64"
           },
           {
-            "name": "timestamp",
-            "type": "i64"
+            "name": "total_sales",
+            "type": "u64"
           },
           {
-            "name": "is_token",
+            "name": "total_commission",
+            "type": "u64"
+          },
+          {
+            "name": "is_active",
             "type": "bool"
           },
           {
-            "name": "token_mint",
-            "type": "pubkey"
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
