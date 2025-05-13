@@ -1,10 +1,13 @@
-import "./globals.css";
-import "@solana/wallet-adapter-react-ui/styles.css";
+import { Metadata } from "next";
 
 import { Inter } from "next/font/google";
-
-import type { Metadata } from "next";
 import { BaseLayout } from "@/components/layouts/BaseLayout";
+
+import Providers from "./providers";
+
+import "@solana/wallet-adapter-react-ui/styles.css";
+
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased min-h-screen bg-gray-900 text-white`}
       >
-        <BaseLayout>{children}</BaseLayout>
+        <Providers>
+          <BaseLayout>{children}</BaseLayout>
+        </Providers>
       </body>
     </html>
   );
