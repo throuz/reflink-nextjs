@@ -223,52 +223,60 @@ export default function MerchantDashboard() {
           <DialogHeader>
             <DialogTitle>Edit Merchant Info</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="edit-name">Business Name</Label>
-              <Input
-                id="edit-name"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-website">Website URL</Label>
-              <Input
-                id="edit-website"
-                value={editWebsite}
-                onChange={(e) => setEditWebsite(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-commission">Commission Rate (%)</Label>
-              <Input
-                id="edit-commission"
-                type="number"
-                min={0}
-                max={100}
-                value={editCommission}
-                onChange={(e) => setEditCommission(e.target.value)}
-                required
-              />
-            </div>
-            <DialogFooter className="flex gap-2">
-              <Button type="submit" className="w-full" disabled={editLoading}>
-                {editLoading ? "Saving..." : "Save Changes"}
-              </Button>
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  disabled={editLoading}
-                >
-                  Cancel
+          <form onSubmit={handleEditSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name" className="mb-1 block">
+                  Business Name
+                </Label>
+                <Input
+                  id="edit-name"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-website" className="mb-1 block">
+                  Website URL
+                </Label>
+                <Input
+                  id="edit-website"
+                  value={editWebsite}
+                  onChange={(e) => setEditWebsite(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-commission" className="mb-1 block">
+                  Commission Rate (%)
+                </Label>
+                <Input
+                  id="edit-commission"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={editCommission}
+                  onChange={(e) => setEditCommission(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button type="submit" disabled={editLoading} className="flex-1">
+                  {editLoading ? "Saving..." : "Save Changes"}
                 </Button>
-              </DialogClose>
-            </DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={editLoading}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

@@ -223,31 +223,35 @@ export default function AffiliateDashboard() {
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="edit-name">Your Name</Label>
-              <Input
-                id="edit-name"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                required
-              />
-            </div>
-            <DialogFooter className="flex gap-2">
-              <Button type="submit" className="w-full" disabled={editLoading}>
-                {editLoading ? "Saving..." : "Save Changes"}
-              </Button>
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  disabled={editLoading}
-                >
-                  Cancel
+          <form onSubmit={handleEditSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name" className="mb-1 block">
+                  Your Name
+                </Label>
+                <Input
+                  id="edit-name"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button type="submit" disabled={editLoading} className="flex-1">
+                  {editLoading ? "Saving..." : "Save Changes"}
                 </Button>
-              </DialogClose>
-            </DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={editLoading}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -258,34 +262,36 @@ export default function AffiliateDashboard() {
           <DialogHeader>
             <DialogTitle>Join Merchant</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleJoinMerchant} className="space-y-4">
-            <div>
-              <Label htmlFor="merchant-authority">
-                Merchant Authority Address
-              </Label>
-              <Input
-                id="merchant-authority"
-                value={merchantAuthority}
-                onChange={(e) => setMerchantAuthority(e.target.value)}
-                placeholder="Enter merchant's wallet address"
-                required
-              />
-            </div>
-            <DialogFooter className="flex gap-2">
-              <Button type="submit" className="w-full" disabled={joinLoading}>
-                {joinLoading ? "Joining..." : "Join"}
-              </Button>
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  disabled={joinLoading}
-                >
-                  Cancel
+          <form onSubmit={handleJoinMerchant}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="merchant-authority" className="mb-1 block">
+                  Merchant Authority Address
+                </Label>
+                <Input
+                  id="merchant-authority"
+                  value={merchantAuthority}
+                  onChange={(e) => setMerchantAuthority(e.target.value)}
+                  placeholder="Enter merchant's wallet address"
+                  required
+                />
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button type="submit" disabled={joinLoading} className="flex-1">
+                  {joinLoading ? "Joining..." : "Join"}
                 </Button>
-              </DialogClose>
-            </DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={joinLoading}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
