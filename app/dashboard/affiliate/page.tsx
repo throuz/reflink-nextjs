@@ -24,6 +24,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { useQueryClient } from "@tanstack/react-query";
+import { ClipboardCopy, Check } from "lucide-react";
 
 export default function AffiliateDashboard() {
   const { publicKey } = useWallet();
@@ -226,6 +227,7 @@ export default function AffiliateDashboard() {
                     <th className="py-2 px-4 text-left">
                       Successful Referrals
                     </th>
+                    <th className="py-2 px-4 text-left">Referral Link</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,6 +247,11 @@ export default function AffiliateDashboard() {
                       </td>
                       <td className="py-2 px-4">
                         {m.relationship.successfulReferrals?.toString()}
+                      </td>
+                      <td className="py-2 px-4">
+                        <CopyReferralButton
+                          link={`${m.websiteUrl}/?ref=${publicKey?.toBase58()}`}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -295,5 +302,34 @@ export default function AffiliateDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function CopyReferralButton({ link }: { link: string }) {
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+  return (
+    <Button
+      type="button"
+      size="icon"
+      variant="outline"
+      className="h-8 w-8 px-0"
+      onClick={async () => {
+        await navigator.clipboard.writeText(link);
+        setCopied(true);
+        toast({
+          title: "Copied!",
+          description: "Referral link copied to clipboard.",
+        });
+        setTimeout(() => setCopied(false), 1000);
+      }}
+      aria-label="Copy referral link"
+    >
+      {copied ? (
+        <Check className="h-4 w-4 text-green-400" />
+      ) : (
+        <ClipboardCopy className="h-4 w-4" />
+      )}
+    </Button>
   );
 }
