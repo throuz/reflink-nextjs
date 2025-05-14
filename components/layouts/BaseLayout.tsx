@@ -5,9 +5,9 @@ import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
-
 import { WalletButton } from "../counter/WalletButton";
 import { SolanaProvider } from "../counter/provider/Solana";
+import { WalletBalance } from "../WalletBalance";
 
 export function BaseLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
@@ -59,6 +59,7 @@ export function BaseLayout({ children }: PropsWithChildren) {
               </nav>
             </div>
             <div className="flex items-center space-x-4">
+              <WalletBalance />
               <WalletButton />
             </div>
           </div>
