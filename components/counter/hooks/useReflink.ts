@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProgram } from "./useProgram";
 import { BN } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
 
 // Helper function to find PDAs
 const findMerchantPDA = async (authority: PublicKey, programId: PublicKey) => {
@@ -58,10 +58,7 @@ export const useRegisterMerchant = () => {
         .accounts({
           authority: publicKey,
           merchant: merchantPDA,
-          systemProgram: PublicKey.findProgramAddressSync(
-            [],
-            program.programId
-          )[0],
+          systemProgram: SystemProgram.programId,
         } as any)
         .rpc();
     },
@@ -102,10 +99,7 @@ export const useUpdateMerchant = () => {
         .accounts({
           authority: publicKey,
           merchant: merchantPDA,
-          systemProgram: PublicKey.findProgramAddressSync(
-            [],
-            program.programId
-          )[0],
+          systemProgram: SystemProgram.programId,
         } as any)
         .rpc();
     },
@@ -150,10 +144,7 @@ export const useRegisterAffiliate = () => {
         .accounts({
           authority: publicKey,
           affiliate: affiliatePDA,
-          systemProgram: PublicKey.findProgramAddressSync(
-            [],
-            program.programId
-          )[0],
+          systemProgram: SystemProgram.programId,
         } as any)
         .rpc();
     },
@@ -182,10 +173,7 @@ export const useUpdateAffiliate = () => {
         .accounts({
           authority: publicKey,
           affiliate: affiliatePDA,
-          systemProgram: PublicKey.findProgramAddressSync(
-            [],
-            program.programId
-          )[0],
+          systemProgram: SystemProgram.programId,
         } as any)
         .rpc();
     },
@@ -248,10 +236,7 @@ export const useJoinMerchant = () => {
           affiliate: affiliatePDA,
           merchant: merchantPDA,
           affiliateMerchant: affiliateMerchantPDA,
-          systemProgram: PublicKey.findProgramAddressSync(
-            [],
-            program.programId
-          )[0],
+          systemProgram: SystemProgram.programId,
         } as any)
         .rpc();
     },
@@ -338,10 +323,7 @@ export const useProcessPurchase = () => {
           affiliateMerchant: affiliateMerchantPDA,
           merchantAuthority,
           affiliateAuthority,
-          systemProgram: PublicKey.findProgramAddressSync(
-            [],
-            program.programId
-          )[0],
+          systemProgram: SystemProgram.programId,
         } as any)
         .rpc();
     },
