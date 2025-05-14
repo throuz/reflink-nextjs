@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { WalletButton } from "../counter/WalletButton";
 import { SolanaProvider } from "../counter/provider/Solana";
 import { WalletBalance } from "../WalletBalance";
+import { WalletListener } from "../WalletListener";
 
 export function BaseLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
@@ -32,6 +33,7 @@ export function BaseLayout({ children }: PropsWithChildren) {
 
   return (
     <SolanaProvider>
+      <WalletListener />
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
         <header className="sticky top-0 z-50 w-full border-b border-gray-800 bg-gray-900/75 backdrop-blur-sm">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
