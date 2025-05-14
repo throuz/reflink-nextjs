@@ -23,6 +23,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AffiliateDashboard() {
   const { publicKey } = useWallet();
@@ -41,6 +42,7 @@ export default function AffiliateDashboard() {
   const { toast } = useToast();
   const { data: allMerchants, isLoading: allMerchantsLoading } =
     useAllMerchants();
+  const queryClient = useQueryClient();
 
   // Edit modal state
   const [editOpen, setEditOpen] = useState(false);
@@ -168,9 +170,22 @@ export default function AffiliateDashboard() {
                       <Button
                         size="sm"
                         onClick={() =>
-                          joinMerchant.mutate({
-                            merchantAuthority: m.authority,
-                          })
+                          joinMerchant.mutate(
+                            { merchantAuthority: m.authority },
+                            {
+                              onSuccess: () => {
+                                queryClient.invalidateQueries({
+                                  queryKey: [
+                                    "affiliateMerchants",
+                                    publicKey?.toBase58(),
+                                  ],
+                                });
+                                queryClient.invalidateQueries({
+                                  queryKey: ["allMerchants"],
+                                });
+                              },
+                            }
+                          )
                         }
                         disabled={joinMerchant.isPending}
                       >
