@@ -14,24 +14,17 @@ export function BaseLayout({ children }: PropsWithChildren) {
 
   const navigationItems = [
     { name: "Home", href: "/" },
-    { name: "Merchants", href: "/merchants" },
-    { name: "Affiliates", href: "/affiliates" },
-    { name: "My Dashboard", href: "/dashboard" },
+    { name: "Dashboard", href: "/dashboard" },
   ];
 
   const footerLinks = {
-    Platform: [
-      { name: "Merchants", href: "/merchants" },
-      { name: "Affiliates", href: "/affiliates" },
-      { name: "Dashboard", href: "/dashboard" },
-    ],
     Resources: [
       { name: "Documentation", href: "#" },
       { name: "API Reference", href: "#" },
       { name: "Terms of Service", href: "#" },
     ],
     Community: [
-      { name: "Twitter", href: "https://twitter.com" },
+      { name: "X", href: "https://x.com" },
       { name: "Discord", href: "https://discord.com" },
       { name: "GitHub", href: "https://github.com" },
     ],
