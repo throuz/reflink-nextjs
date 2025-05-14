@@ -69,6 +69,7 @@ export default function Register() {
       });
       router.push("/dashboard/merchant");
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Failed to register as merchant",
@@ -96,6 +97,7 @@ export default function Register() {
       });
       router.push("/dashboard/affiliate");
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Failed to register as affiliate",

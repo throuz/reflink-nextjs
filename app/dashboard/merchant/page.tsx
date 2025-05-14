@@ -57,6 +57,7 @@ export default function MerchantDashboard() {
         }.`,
       });
     } catch (e) {
+      console.error(e);
       toast({
         title: "Error",
         description: "Failed to update status.",
@@ -89,6 +90,7 @@ export default function MerchantDashboard() {
         description: "Merchant info updated.",
       });
     } catch (e) {
+      console.error(e);
       toast({
         title: "Error",
         description: "Failed to update merchant info.",
@@ -193,7 +195,7 @@ export default function MerchantDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {affiliates.map((a: any) => (
+                  {affiliates.map((a) => (
                     <tr
                       key={a.publicKey.toBase58()}
                       className="border-b border-gray-800"

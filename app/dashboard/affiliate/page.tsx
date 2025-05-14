@@ -1,30 +1,31 @@
 "use client";
 
 import { useState } from "react";
+
+import { Check, ClipboardCopy } from "lucide-react";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   useAffiliate,
   useAffiliateMerchants,
-  useUpdateAffiliate,
-  useJoinMerchant,
   useAllMerchants,
+  useJoinMerchant,
+  useUpdateAffiliate,
 } from "@/components/counter/hooks/useReflink";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { PublicKey } from "@solana/web3.js";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { useQueryClient } from "@tanstack/react-query";
-import { ClipboardCopy, Check } from "lucide-react";
 
 export default function AffiliateDashboard() {
   const { publicKey } = useWallet();
@@ -70,6 +71,7 @@ export default function AffiliateDashboard() {
         description: "Profile updated.",
       });
     } catch (e) {
+      console.error(e);
       toast({
         title: "Error",
         description: "Failed to update profile.",
@@ -144,9 +146,9 @@ export default function AffiliateDashboard() {
             <div>Loading merchants...</div>
           ) : allMerchants && allMerchants.length > 0 ? (
             <div className="space-y-4">
-              {allMerchants.map((m: any) => {
+              {allMerchants.map((m) => {
                 const alreadyJoined = merchants?.some(
-                  (joined: any) =>
+                  (joined) =>
                     joined.publicKey.toBase58() === m.publicKey.toBase58()
                 );
                 return (
@@ -231,7 +233,7 @@ export default function AffiliateDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {merchants.map((m: any) => (
+                  {merchants.map((m) => (
                     <tr
                       key={m.publicKey.toBase58()}
                       className="border-b border-gray-800"

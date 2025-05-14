@@ -496,6 +496,7 @@ export const useUserRole = () => {
           merchantPDA,
         };
       } catch (error) {
+        console.error(error);
         try {
           // Check if user is an affiliate
           const [affiliatePDA] = await findAffiliatePDA(
@@ -513,6 +514,7 @@ export const useUserRole = () => {
             affiliatePDA,
           };
         } catch (error) {
+          console.error(error);
           // User is neither merchant nor affiliate
           return {
             isMerchant: false,
