@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/reflink.json`.
  */
 export type Reflink = {
-  address: "2BkHiWJxLd91RWQWWcr97ggCsdA3PY1MTRoC9AJuZad9";
+  address: "8fbRBf8a2mfYz4UAGZnsdbuCCB6LsXKePkZrv4MefRCX";
   metadata: {
     name: "reflink";
     version: "0.1.0";

@@ -4,7 +4,7 @@ import { PublicKey } from "@solana/web3.js";
 
 // Define a constant for the program ID from the uploaded code
 export const PROGRAM_ID = new PublicKey(
-  "2BkHiWJxLd91RWQWWcr97ggCsdA3PY1MTRoC9AJuZad9"
+  "8fbRBf8a2mfYz4UAGZnsdbuCCB6LsXKePkZrv4MefRCX"
 );
 
 // Helper function to derive PDA addresses
