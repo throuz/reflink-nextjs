@@ -14,6 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { PublicKey } from "@solana/web3.js";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export default function AffiliateDashboard() {
   const { publicKey } = useWallet();
@@ -209,90 +217,78 @@ export default function AffiliateDashboard() {
         </CardContent>
       </Card>
 
-      {/* Edit Profile Modal */}
-      {editOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-gray-900 rounded-lg p-8 w-full max-w-md shadow-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
-              onClick={() => setEditOpen(false)}
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="edit-name">Your Name</Label>
-                <Input
-                  id="edit-name"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" className="w-full" disabled={editLoading}>
-                  {editLoading ? "Saving..." : "Save Changes"}
-                </Button>
+      {/* Edit Profile Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Your Name</Label>
+              <Input
+                id="edit-name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button type="submit" className="w-full" disabled={editLoading}>
+                {editLoading ? "Saving..." : "Save Changes"}
+              </Button>
+              <DialogClose asChild>
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => setEditOpen(false)}
                   disabled={editLoading}
                 >
                   Cancel
                 </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-      {/* Join Merchant Modal */}
-      {joinOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-gray-900 rounded-lg p-8 w-full max-w-md shadow-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
-              onClick={() => setJoinOpen(false)}
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <h2 className="text-xl font-bold mb-4">Join Merchant</h2>
-            <form onSubmit={handleJoinMerchant} className="space-y-4">
-              <div>
-                <Label htmlFor="merchant-authority">
-                  Merchant Authority Address
-                </Label>
-                <Input
-                  id="merchant-authority"
-                  value={merchantAuthority}
-                  onChange={(e) => setMerchantAuthority(e.target.value)}
-                  placeholder="Enter merchant's wallet address"
-                  required
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" className="w-full" disabled={joinLoading}>
-                  {joinLoading ? "Joining..." : "Join"}
-                </Button>
+      {/* Join Merchant Dialog */}
+      <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Join Merchant</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleJoinMerchant} className="space-y-4">
+            <div>
+              <Label htmlFor="merchant-authority">
+                Merchant Authority Address
+              </Label>
+              <Input
+                id="merchant-authority"
+                value={merchantAuthority}
+                onChange={(e) => setMerchantAuthority(e.target.value)}
+                placeholder="Enter merchant's wallet address"
+                required
+              />
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button type="submit" className="w-full" disabled={joinLoading}>
+                {joinLoading ? "Joining..." : "Join"}
+              </Button>
+              <DialogClose asChild>
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => setJoinOpen(false)}
                   disabled={joinLoading}
                 >
                   Cancel
                 </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

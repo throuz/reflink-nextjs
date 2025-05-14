@@ -12,6 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export default function MerchantDashboard() {
   const { publicKey } = useWallet();
@@ -209,67 +217,61 @@ export default function MerchantDashboard() {
         </CardContent>
       </Card>
 
-      {/* Edit Modal */}
-      {editOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-gray-900 rounded-lg p-8 w-full max-w-md shadow-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
-              onClick={() => setEditOpen(false)}
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <h2 className="text-xl font-bold mb-4">Edit Merchant Info</h2>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="edit-name">Business Name</Label>
-                <Input
-                  id="edit-name"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-website">Website URL</Label>
-                <Input
-                  id="edit-website"
-                  value={editWebsite}
-                  onChange={(e) => setEditWebsite(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-commission">Commission Rate (%)</Label>
-                <Input
-                  id="edit-commission"
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={editCommission}
-                  onChange={(e) => setEditCommission(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" className="w-full" disabled={editLoading}>
-                  {editLoading ? "Saving..." : "Save Changes"}
-                </Button>
+      {/* Edit Info Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Merchant Info</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Business Name</Label>
+              <Input
+                id="edit-name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-website">Website URL</Label>
+              <Input
+                id="edit-website"
+                value={editWebsite}
+                onChange={(e) => setEditWebsite(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-commission">Commission Rate (%)</Label>
+              <Input
+                id="edit-commission"
+                type="number"
+                min={0}
+                max={100}
+                value={editCommission}
+                onChange={(e) => setEditCommission(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button type="submit" className="w-full" disabled={editLoading}>
+                {editLoading ? "Saving..." : "Save Changes"}
+              </Button>
+              <DialogClose asChild>
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => setEditOpen(false)}
                   disabled={editLoading}
                 >
                   Cancel
                 </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
