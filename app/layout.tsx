@@ -15,8 +15,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Reflink | Solana Affiliate Marketing Platform",
-  description: "Launch and manage your affiliate marketing campaigns on Solana",
+  title: "Reflink | Direct Merchant-Affiliate Platform on Solana",
+  description:
+    "Connect merchants and affiliates directly with automated commission distribution and instant SOL payouts on Solana",
 };
 
 export default function RootLayout({

@@ -14,20 +14,21 @@ export function BaseLayout({ children }: PropsWithChildren) {
 
   const navigationItems = [
     { name: "Home", href: "/" },
-    { name: "Campaigns", href: "/campaigns" },
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "Merchants", href: "/merchants" },
+    { name: "Affiliates", href: "/affiliates" },
+    { name: "My Dashboard", href: "/dashboard" },
   ];
 
   const footerLinks = {
-    Product: [
-      { name: "Features", href: "#" },
-      { name: "Documentation", href: "#" },
-      { name: "Pricing", href: "#" },
+    Platform: [
+      { name: "Merchants", href: "/merchants" },
+      { name: "Affiliates", href: "/affiliates" },
+      { name: "Dashboard", href: "/dashboard" },
     ],
     Resources: [
-      { name: "Blog", href: "#" },
-      { name: "Support", href: "#" },
-      { name: "Terms", href: "#" },
+      { name: "Documentation", href: "#" },
+      { name: "API Reference", href: "#" },
+      { name: "Terms of Service", href: "#" },
     ],
     Community: [
       { name: "Twitter", href: "https://twitter.com" },
@@ -82,7 +83,7 @@ export function BaseLayout({ children }: PropsWithChildren) {
                   <span className="text-xl font-bold text-white">Reflink</span>
                 </Link>
                 <p className="text-gray-400 text-sm">
-                  The next generation affiliate marketing platform on Solana
+                  Direct merchant-affiliate platform on Solana
                 </p>
               </div>
               {Object.entries(footerLinks).map(([category, links]) => (

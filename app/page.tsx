@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { CheckCircle, Wallet } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -27,14 +27,14 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              <span className="block">Supercharge Your</span>
+              <span className="block">Direct</span>
               <span className="block text-indigo-500">Affiliate Marketing</span>
               <span className="block">on Solana</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-300">
-              Launch transparent, efficient, and automated affiliate campaigns
-              powered by blockchain technology. No middlemen, instant payouts,
-              and real-time tracking.
+              Connect merchants and affiliates directly with automated
+              commission distribution, transparent tracking, and instant SOL
+              payouts on Solana.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button
@@ -43,7 +43,7 @@ export default function Home() {
                 onClick={handleClick}
               >
                 {connected ? "Go to Dashboard" : "Connect Wallet"}
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <Wallet className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 variant="link"
@@ -66,38 +66,38 @@ export default function Home() {
               How It Works
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-gray-400">
-              Simple, transparent, and efficient affiliate marketing powered by
-              Solana
+              Simple and transparent affiliate marketing powered by Solana smart
+              contracts
             </p>
           </div>
 
           <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                title: "For Advertisers",
+                title: "For Merchants",
                 features: [
-                  "Create campaigns in seconds",
-                  "Set custom payouts and budgets",
-                  "Real-time performance tracking",
-                  "Automatic payments in SOL",
+                  "Register your business",
+                  "Set your commission rate",
+                  "Connect with affiliates",
+                  "Automated SOL payouts",
                 ],
               },
               {
                 title: "For Affiliates",
                 features: [
-                  "Generate unique referral links",
-                  "Track clicks and conversions",
-                  "Instant payouts to your wallet",
-                  "Transparent commission rates",
+                  "Register as an affiliate",
+                  "Join merchant programs",
+                  "Track your earnings",
+                  "Receive instant SOL",
                 ],
               },
               {
                 title: "Platform Benefits",
                 features: [
-                  "No middlemen or delays",
-                  "Low transaction fees",
-                  "Blockchain transparency",
                   "Smart contract security",
+                  "Direct relationships",
+                  "Low transaction fees",
+                  "No intermediaries",
                 ],
               },
             ].map((group, i) => (
@@ -130,8 +130,7 @@ export default function Home() {
               Ready to Get Started?
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-gray-300">
-              Connect your wallet and start earning or launching campaigns in
-              minutes
+              Connect your Solana wallet to register as a merchant or affiliate
             </p>
             <div className="mt-10">
               <Button
@@ -140,7 +139,7 @@ export default function Home() {
                 onClick={handleClick}
               >
                 {connected ? "Go to Dashboard" : "Connect Wallet"}
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <Wallet className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
