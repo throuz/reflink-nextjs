@@ -487,3 +487,58 @@ export const useAffiliateMerchants = (affiliateAuthority?: PublicKey) => {
     enabled: !!affiliateAuthority && !!program,
   });
 };
+
+// User Role Hook
+export const useUserRole = () => {
+  const { program, publicKey } = useProgram();
+
+  return useQuery({
+    queryKey: ["userRole", publicKey?.toBase58()],
+    queryFn: async () => {
+      if (!publicKey || !program) throw new Error("Wallet not connected");
+
+      try {
+        // Check if user is a merchant
+        const [merchantPDA] = await findMerchantPDA(
+          publicKey,
+          program.programId
+        );
+        const merchantAccount = await program.account.merchant.fetch(
+          merchantPDA
+        );
+
+        return {
+          isMerchant: true,
+          isAffiliate: false,
+          merchantAccount,
+          merchantPDA,
+        };
+      } catch (error) {
+        try {
+          // Check if user is an affiliate
+          const [affiliatePDA] = await findAffiliatePDA(
+            publicKey,
+            program.programId
+          );
+          const affiliateAccount = await program.account.affiliate.fetch(
+            affiliatePDA
+          );
+
+          return {
+            isMerchant: false,
+            isAffiliate: true,
+            affiliateAccount,
+            affiliatePDA,
+          };
+        } catch (error) {
+          // User is neither merchant nor affiliate
+          return {
+            isMerchant: false,
+            isAffiliate: false,
+          };
+        }
+      }
+    },
+    enabled: !!publicKey && !!program,
+  });
+};
