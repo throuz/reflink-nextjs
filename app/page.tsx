@@ -1,22 +1,42 @@
 "use client";
 
 import { CheckCircle, Wallet } from "lucide-react";
-
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useUserRole } from "@/components/counter/hooks/useReflink";
 
 export default function Home() {
   const { connected } = useWallet();
   const { setVisible } = useWalletModal();
   const router = useRouter();
+  const { data: userRole, isLoading } = useUserRole();
 
   const handleClick = () => {
     if (!connected) {
       setVisible(true);
+      return;
+    }
+
+    if (isLoading) {
+      return;
+    }
+
+    if (!userRole) {
+      // User is not connected or role check failed
+      return;
+    }
+
+    if (userRole.isMerchant) {
+      // Redirect to merchant dashboard
+      router.push("/dashboard/merchant");
+    } else if (userRole.isAffiliate) {
+      // Redirect to affiliate dashboard
+      router.push("/dashboard/affiliate");
     } else {
-      router.push("/dashboard");
+      // User has no role, redirect to role selection page
+      router.push("/register");
     }
   };
 
@@ -41,9 +61,22 @@ export default function Home() {
                 size="lg"
                 className="bg-indigo-500 hover:bg-indigo-600"
                 onClick={handleClick}
+                disabled={isLoading}
               >
-                {connected ? "Go to Dashboard" : "Connect Wallet"}
-                <Wallet className="ml-2 h-5 w-5" />
+                {!connected ? (
+                  <>
+                    Connect Wallet
+                    <Wallet className="ml-2 h-5 w-5" />
+                  </>
+                ) : isLoading ? (
+                  "Loading..."
+                ) : userRole?.isMerchant ? (
+                  "Go to Merchant Dashboard"
+                ) : userRole?.isAffiliate ? (
+                  "Go to Affiliate Dashboard"
+                ) : (
+                  "Choose Your Role"
+                )}
               </Button>
               <Button
                 variant="link"
@@ -137,9 +170,22 @@ export default function Home() {
                 size="lg"
                 className="bg-indigo-500 hover:bg-indigo-600"
                 onClick={handleClick}
+                disabled={isLoading}
               >
-                {connected ? "Go to Dashboard" : "Connect Wallet"}
-                <Wallet className="ml-2 h-5 w-5" />
+                {!connected ? (
+                  <>
+                    Connect Wallet
+                    <Wallet className="ml-2 h-5 w-5" />
+                  </>
+                ) : isLoading ? (
+                  "Loading..."
+                ) : userRole?.isMerchant ? (
+                  "Go to Merchant Dashboard"
+                ) : userRole?.isAffiliate ? (
+                  "Go to Affiliate Dashboard"
+                ) : (
+                  "Choose Your Role"
+                )}
               </Button>
             </div>
           </div>
