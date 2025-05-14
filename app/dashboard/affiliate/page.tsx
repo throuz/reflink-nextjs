@@ -237,9 +237,6 @@ export default function AffiliateDashboard() {
                 />
               </div>
               <div className="flex gap-3 mt-6">
-                <Button type="submit" disabled={editLoading} className="flex-1">
-                  {editLoading ? "Saving..." : "Save Changes"}
-                </Button>
                 <DialogClose asChild>
                   <Button
                     type="button"
@@ -250,6 +247,9 @@ export default function AffiliateDashboard() {
                     Cancel
                   </Button>
                 </DialogClose>
+                <Button type="submit" disabled={editLoading} className="flex-1">
+                  {editLoading ? "Saving..." : "Save Changes"}
+                </Button>
               </div>
             </div>
           </form>
@@ -277,9 +277,6 @@ export default function AffiliateDashboard() {
                 />
               </div>
               <div className="flex gap-3 mt-6">
-                <Button type="submit" disabled={joinLoading} className="flex-1">
-                  {joinLoading ? "Joining..." : "Join"}
-                </Button>
                 <DialogClose asChild>
                   <Button
                     type="button"
@@ -290,6 +287,9 @@ export default function AffiliateDashboard() {
                     Cancel
                   </Button>
                 </DialogClose>
+                <Button type="submit" disabled={joinLoading} className="flex-1">
+                  {joinLoading ? "Joining..." : "Join"}
+                </Button>
               </div>
             </div>
           </form>

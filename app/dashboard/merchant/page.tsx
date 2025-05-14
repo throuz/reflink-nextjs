@@ -262,9 +262,6 @@ export default function MerchantDashboard() {
                 />
               </div>
               <div className="flex gap-3 mt-6">
-                <Button type="submit" disabled={editLoading} className="flex-1">
-                  {editLoading ? "Saving..." : "Save Changes"}
-                </Button>
                 <DialogClose asChild>
                   <Button
                     type="button"
@@ -275,6 +272,9 @@ export default function MerchantDashboard() {
                     Cancel
                   </Button>
                 </DialogClose>
+                <Button type="submit" disabled={editLoading} className="flex-1">
+                  {editLoading ? "Saving..." : "Save Changes"}
+                </Button>
               </div>
             </div>
           </form>
