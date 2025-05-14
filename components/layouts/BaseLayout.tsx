@@ -3,21 +3,14 @@
 import { PropsWithChildren } from "react";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletButton } from "../counter/WalletButton";
 import { SolanaProvider } from "../counter/provider/Solana";
 import { WalletBalance } from "../WalletBalance";
 import { WalletListener } from "../WalletListener";
+import { NavLinks } from "../navigation/NavLinks";
 
 export function BaseLayout({ children }: PropsWithChildren) {
-  const pathname = usePathname();
-
-  const navigationItems = [
-    { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
-  ];
-
   const footerLinks = {
     Resources: [
       { name: "Documentation", href: "#" },
@@ -44,21 +37,7 @@ export function BaseLayout({ children }: PropsWithChildren) {
               >
                 <span className="text-xl font-bold text-white">Reflink</span>
               </Link>
-              <nav className="hidden md:flex space-x-6">
-                {navigationItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`text-sm transition-colors ${
-                      pathname === item.href
-                        ? "text-white font-medium"
-                        : "text-gray-400 hover:text-white"
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
+              <NavLinks />
             </div>
             <div className="flex items-center space-x-4">
               <WalletBalance />
