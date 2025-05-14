@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProgram } from "./useProgram";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { Reflink } from "@/anchor-idl/idl";
 
 // Helper function to find PDAs
 const findMerchantPDA = async (authority: PublicKey, programId: PublicKey) => {
@@ -351,5 +350,140 @@ export const useProcessPurchase = () => {
       queryClient.invalidateQueries({ queryKey: ["affiliate"] });
       queryClient.invalidateQueries({ queryKey: ["affiliateMerchant"] });
     },
+  });
+};
+
+// Get all merchants
+export const useAllMerchants = () => {
+  const { program } = useProgram();
+
+  return useQuery({
+    queryKey: ["allMerchants"],
+    queryFn: async () => {
+      if (!program) throw new Error("Program not initialized");
+
+      const merchants = await program.account.merchant.all();
+      return merchants.map((merchant) => ({
+        ...merchant.account,
+        publicKey: merchant.publicKey,
+      }));
+    },
+    enabled: !!program,
+  });
+};
+
+// Get all affiliates
+export const useAllAffiliates = () => {
+  const { program } = useProgram();
+
+  return useQuery({
+    queryKey: ["allAffiliates"],
+    queryFn: async () => {
+      if (!program) throw new Error("Program not initialized");
+
+      const affiliates = await program.account.affiliate.all();
+      return affiliates.map((affiliate) => ({
+        ...affiliate.account,
+        publicKey: affiliate.publicKey,
+      }));
+    },
+    enabled: !!program,
+  });
+};
+
+// Get all affiliates for a specific merchant
+export const useMerchantAffiliates = (merchantAuthority?: PublicKey) => {
+  const { program } = useProgram();
+
+  return useQuery({
+    queryKey: ["merchantAffiliates", merchantAuthority?.toBase58()],
+    queryFn: async () => {
+      if (!merchantAuthority || !program) throw new Error("Invalid parameters");
+
+      // Get merchant PDA
+      const [merchantPDA] = await findMerchantPDA(
+        merchantAuthority,
+        program.programId
+      );
+
+      // Get all affiliate-merchant relationships
+      const relationships = await program.account.affiliateMerchant.all([
+        {
+          memcmp: {
+            offset: 8, // Skip discriminator
+            bytes: merchantPDA.toBase58(),
+          },
+        },
+      ]);
+
+      // Get affiliate details for each relationship
+      const affiliates = await Promise.all(
+        relationships.map(async (relationship) => {
+          const affiliateAccount = await program.account.affiliate.fetch(
+            relationship.account.affiliate
+          );
+          return {
+            ...affiliateAccount,
+            publicKey: relationship.account.affiliate,
+            relationship: {
+              ...relationship.account,
+              publicKey: relationship.publicKey,
+            },
+          };
+        })
+      );
+
+      return affiliates;
+    },
+    enabled: !!merchantAuthority && !!program,
+  });
+};
+
+// Get all merchants for a specific affiliate
+export const useAffiliateMerchants = (affiliateAuthority?: PublicKey) => {
+  const { program } = useProgram();
+
+  return useQuery({
+    queryKey: ["affiliateMerchants", affiliateAuthority?.toBase58()],
+    queryFn: async () => {
+      if (!affiliateAuthority || !program)
+        throw new Error("Invalid parameters");
+
+      // Get affiliate PDA
+      const [affiliatePDA] = await findAffiliatePDA(
+        affiliateAuthority,
+        program.programId
+      );
+
+      // Get all affiliate-merchant relationships
+      const relationships = await program.account.affiliateMerchant.all([
+        {
+          memcmp: {
+            offset: 8 + 32, // Skip discriminator and merchant pubkey
+            bytes: affiliatePDA.toBase58(),
+          },
+        },
+      ]);
+
+      // Get merchant details for each relationship
+      const merchants = await Promise.all(
+        relationships.map(async (relationship) => {
+          const merchantAccount = await program.account.merchant.fetch(
+            relationship.account.merchant
+          );
+          return {
+            ...merchantAccount,
+            publicKey: relationship.account.merchant,
+            relationship: {
+              ...relationship.account,
+              publicKey: relationship.publicKey,
+            },
+          };
+        })
+      );
+
+      return merchants;
+    },
+    enabled: !!affiliateAuthority && !!program,
   });
 };
