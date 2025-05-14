@@ -7,6 +7,7 @@ import {
   useAffiliateMerchants,
   useUpdateAffiliate,
   useJoinMerchant,
+  useAllMerchants,
 } from "@/components/counter/hooks/useReflink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,8 @@ export default function AffiliateDashboard() {
   const updateAffiliate = useUpdateAffiliate();
   const joinMerchant = useJoinMerchant();
   const { toast } = useToast();
+  const { data: allMerchants, isLoading: allMerchantsLoading } =
+    useAllMerchants();
 
   // Edit modal state
   const [editOpen, setEditOpen] = useState(false);
@@ -162,7 +165,63 @@ export default function AffiliateDashboard() {
         </CardContent>
       </Card>
 
-      {/* Merchants List */}
+      {/* Available Merchants Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Merchants</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {allMerchantsLoading ? (
+            <div>Loading merchants...</div>
+          ) : allMerchants && allMerchants.length > 0 ? (
+            <div className="space-y-4">
+              {allMerchants.map((m: any) => {
+                const alreadyJoined = merchants?.some(
+                  (joined: any) =>
+                    joined.publicKey.toBase58() === m.publicKey.toBase58()
+                );
+                return (
+                  <div
+                    key={m.publicKey.toBase58()}
+                    className="border border-gray-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+                  >
+                    <div>
+                      <div className="font-semibold">{m.name}</div>
+                      <div className="text-gray-400 text-sm">
+                        {m.websiteUrl}
+                      </div>
+                      <div className="text-xs mt-1">
+                        Commission Rate: <b>{m.commissionRate?.toString()}%</b>
+                      </div>
+                    </div>
+                    {alreadyJoined ? (
+                      <span className="text-green-500 text-xs font-semibold">
+                        Joined
+                      </span>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          joinMerchant.mutate({
+                            merchantAuthority: m.authority,
+                          })
+                        }
+                        disabled={joinMerchant.isPending}
+                      >
+                        Join
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div>No merchants available.</div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Merchants Joined Card */}
       <Card>
         <CardHeader>
           <CardTitle>Merchants Joined</CardTitle>
