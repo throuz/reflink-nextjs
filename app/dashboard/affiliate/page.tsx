@@ -47,11 +47,6 @@ export default function AffiliateDashboard() {
   const [editName, setEditName] = useState("");
   const [editLoading, setEditLoading] = useState(false);
 
-  // Join merchant modal state
-  const [joinOpen, setJoinOpen] = useState(false);
-  const [merchantAuthority, setMerchantAuthority] = useState("");
-  const [joinLoading, setJoinLoading] = useState(false);
-
   // Open edit modal and prefill
   const openEdit = () => {
     setEditName(affiliate?.name || "");
@@ -79,32 +74,6 @@ export default function AffiliateDashboard() {
       });
     } finally {
       setEditLoading(false);
-    }
-  };
-
-  // Handle join merchant
-  const handleJoinMerchant = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setJoinLoading(true);
-    try {
-      await joinMerchant.mutateAsync({
-        merchantAuthority: new PublicKey(merchantAuthority),
-      });
-      setJoinOpen(false);
-      setMerchantAuthority("");
-      toast({
-        title: "Success",
-        description: "Joined merchant successfully.",
-      });
-    } catch (e) {
-      toast({
-        title: "Error",
-        description:
-          "Failed to join merchant. Make sure the address is correct and you are not already joined.",
-        variant: "destructive",
-      });
-    } finally {
-      setJoinLoading(false);
     }
   };
 
@@ -142,9 +111,6 @@ export default function AffiliateDashboard() {
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={openEdit}>
                 Edit Profile
-              </Button>
-              <Button size="sm" onClick={() => setJoinOpen(true)}>
-                Join Merchant
               </Button>
             </div>
           </CardTitle>
@@ -308,46 +274,6 @@ export default function AffiliateDashboard() {
                 </DialogClose>
                 <Button type="submit" disabled={editLoading} className="flex-1">
                   {editLoading ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Join Merchant Dialog */}
-      <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Join Merchant</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleJoinMerchant}>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="merchant-authority" className="mb-1 block">
-                  Merchant Authority Address
-                </Label>
-                <Input
-                  id="merchant-authority"
-                  value={merchantAuthority}
-                  onChange={(e) => setMerchantAuthority(e.target.value)}
-                  placeholder="Enter merchant's wallet address"
-                  required
-                />
-              </div>
-              <div className="flex gap-3 mt-6">
-                <DialogClose asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={joinLoading}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <Button type="submit" disabled={joinLoading} className="flex-1">
-                  {joinLoading ? "Joining..." : "Join"}
                 </Button>
               </div>
             </div>
