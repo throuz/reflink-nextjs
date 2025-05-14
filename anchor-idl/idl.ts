@@ -14,11 +14,47 @@ export type Reflink = {
   };
   instructions: [
     {
-      name: "createAffiliateProgram";
-      discriminator: [98, 186, 216, 40, 40, 253, 210, 236];
+      name: "joinMerchant";
+      discriminator: [222, 215, 177, 87, 139, 47, 221, 130];
       accounts: [
         {
-          name: "affiliateProgram";
+          name: "authority";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "affiliate";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
+              },
+              {
+                kind: "account";
+                path: "authority";
+              }
+            ];
+          };
+        },
+        {
+          name: "merchant";
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "merchant.authority";
+                account: "merchant";
+              }
+            ];
+          };
+        },
+        {
+          name: "affiliateMerchant";
           writable: true;
           pda: {
             seeds: [
@@ -34,15 +70,20 @@ export type Reflink = {
                   97,
                   116,
                   101,
-                  95,
-                  112,
+                  45,
+                  109,
+                  101,
                   114,
-                  111,
-                  103,
-                  114,
+                  99,
+                  104,
                   97,
-                  109
+                  110,
+                  116
                 ];
+              },
+              {
+                kind: "account";
+                path: "affiliate";
               },
               {
                 kind: "account";
@@ -52,12 +93,101 @@ export type Reflink = {
           };
         },
         {
-          name: "merchant";
-        },
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "processPurchase";
+      discriminator: [38, 233, 48, 62, 162, 120, 177, 244];
+      accounts: [
         {
-          name: "authority";
+          name: "customer";
           writable: true;
           signer: true;
+        },
+        {
+          name: "merchant";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "merchant.authority";
+                account: "merchant";
+              }
+            ];
+          };
+        },
+        {
+          name: "affiliate";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
+              },
+              {
+                kind: "account";
+                path: "affiliate.authority";
+                account: "affiliate";
+              }
+            ];
+          };
+        },
+        {
+          name: "affiliateMerchant";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [
+                  97,
+                  102,
+                  102,
+                  105,
+                  108,
+                  105,
+                  97,
+                  116,
+                  101,
+                  45,
+                  109,
+                  101,
+                  114,
+                  99,
+                  104,
+                  97,
+                  110,
+                  116
+                ];
+              },
+              {
+                kind: "account";
+                path: "affiliate";
+              },
+              {
+                kind: "account";
+                path: "merchant";
+              }
+            ];
+          };
+        },
+        {
+          name: "merchantAuthority";
+          writable: true;
+        },
+        {
+          name: "affiliateAuthority";
+          writable: true;
         },
         {
           name: "systemProgram";
@@ -66,19 +196,57 @@ export type Reflink = {
       ];
       args: [
         {
-          name: "programName";
-          type: "string";
-        },
-        {
-          name: "referrerFeeBasisPoints";
-          type: "u16";
+          name: "amount";
+          type: "u64";
         }
       ];
     },
     {
-      name: "createMerchant";
-      discriminator: [249, 172, 245, 100, 32, 117, 97, 156];
+      name: "registerAffiliate";
+      discriminator: [87, 121, 99, 184, 126, 63, 103, 217];
       accounts: [
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "affiliate";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
+              },
+              {
+                kind: "account";
+                path: "authority";
+              }
+            ];
+          };
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        }
+      ];
+      args: [
+        {
+          name: "name";
+          type: "string";
+        }
+      ];
+    },
+    {
+      name: "registerMerchant";
+      discriminator: [238, 245, 77, 132, 161, 88, 216, 248];
+      accounts: [
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        },
         {
           name: "merchant";
           writable: true;
@@ -96,67 +264,49 @@ export type Reflink = {
           };
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
-        },
-        {
           name: "systemProgram";
           address: "11111111111111111111111111111111";
         }
       ];
       args: [
         {
-          name: "merchantName";
+          name: "name";
+          type: "string";
+        },
+        {
+          name: "commissionRate";
+          type: "u8";
+        },
+        {
+          name: "websiteUrl";
           type: "string";
         }
       ];
     },
     {
-      name: "createReferralLink";
-      discriminator: [246, 55, 144, 190, 86, 38, 25, 213];
+      name: "updateAffiliate";
+      discriminator: [4, 8, 247, 126, 7, 112, 181, 99];
       accounts: [
         {
-          name: "referralLink";
+          name: "authority";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "affiliate";
           writable: true;
           pda: {
             seeds: [
               {
                 kind: "const";
-                value: [
-                  114,
-                  101,
-                  102,
-                  101,
-                  114,
-                  114,
-                  97,
-                  108,
-                  95,
-                  108,
-                  105,
-                  110,
-                  107
-                ];
+                value: [97, 102, 102, 105, 108, 105, 97, 116, 101];
               },
               {
                 kind: "account";
-                path: "affiliateProgram";
-              },
-              {
-                kind: "account";
-                path: "referrer";
+                path: "authority";
               }
             ];
           };
-        },
-        {
-          name: "affiliateProgram";
-        },
-        {
-          name: "referrer";
-          writable: true;
-          signer: true;
         },
         {
           name: "systemProgram";
@@ -165,46 +315,37 @@ export type Reflink = {
       ];
       args: [
         {
-          name: "uniqueCode";
-          type: "string";
+          name: "name";
+          type: {
+            option: "string";
+          };
         }
       ];
     },
     {
-      name: "incrementClick";
-      discriminator: [189, 6, 253, 63, 135, 146, 88, 65];
+      name: "updateMerchant";
+      discriminator: [192, 114, 143, 220, 199, 50, 234, 165];
       accounts: [
-        {
-          name: "referralLink";
-          writable: true;
-        },
         {
           name: "authority";
+          writable: true;
           signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "initializePlatform";
-      discriminator: [119, 201, 101, 45, 75, 122, 89, 3];
-      accounts: [
+        },
         {
-          name: "platform";
+          name: "merchant";
           writable: true;
           pda: {
             seeds: [
               {
                 kind: "const";
-                value: [112, 108, 97, 116, 102, 111, 114, 109];
+                value: [109, 101, 114, 99, 104, 97, 110, 116];
+              },
+              {
+                kind: "account";
+                path: "authority";
               }
             ];
           };
-        },
-        {
-          name: "authority";
-          writable: true;
-          signer: true;
         },
         {
           name: "systemProgram";
@@ -213,218 +354,94 @@ export type Reflink = {
       ];
       args: [
         {
-          name: "platformFeeBasisPoints";
-          type: "u16";
-        }
-      ];
-    },
-    {
-      name: "processSale";
-      discriminator: [103, 228, 248, 104, 78, 46, 193, 82];
-      accounts: [
-        {
-          name: "platform";
+          name: "name";
+          type: {
+            option: "string";
+          };
         },
         {
-          name: "merchant";
+          name: "commissionRate";
+          type: {
+            option: "u8";
+          };
         },
         {
-          name: "affiliateProgram";
+          name: "websiteUrl";
+          type: {
+            option: "string";
+          };
         },
         {
-          name: "referralLink";
-          writable: true;
-        },
-        {
-          name: "buyer";
-          writable: true;
-          signer: true;
-        },
-        {
-          name: "buyerTokenAccount";
-          writable: true;
-        },
-        {
-          name: "merchantTokenAccount";
-          writable: true;
-        },
-        {
-          name: "referrerTokenAccount";
-          writable: true;
-        },
-        {
-          name: "platformTokenAccount";
-          writable: true;
-        },
-        {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-        }
-      ];
-      args: [
-        {
-          name: "amount";
-          type: "u64";
-        }
-      ];
-    },
-    {
-      name: "toggleAffiliateProgramStatus";
-      discriminator: [11, 194, 31, 217, 193, 188, 43, 239];
-      accounts: [
-        {
-          name: "affiliateProgram";
-          writable: true;
-        },
-        {
-          name: "merchant";
-        },
-        {
-          name: "authority";
-          signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "toggleMerchantStatus";
-      discriminator: [251, 186, 166, 45, 108, 107, 186, 170];
-      accounts: [
-        {
-          name: "merchant";
-          writable: true;
-        },
-        {
-          name: "authority";
-          signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "toggleReferralLinkStatus";
-      discriminator: [26, 73, 35, 181, 45, 41, 160, 31];
-      accounts: [
-        {
-          name: "referralLink";
-          writable: true;
-        },
-        {
-          name: "authority";
-          signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "updatePlatformFee";
-      discriminator: [162, 97, 186, 47, 93, 113, 176, 243];
-      accounts: [
-        {
-          name: "platform";
-          writable: true;
-        },
-        {
-          name: "authority";
-          signer: true;
-        }
-      ];
-      args: [
-        {
-          name: "newFeeBasisPoints";
-          type: "u16";
+          name: "isActive";
+          type: {
+            option: "bool";
+          };
         }
       ];
     }
   ];
   accounts: [
     {
-      name: "affiliateProgram";
-      discriminator: [101, 106, 6, 88, 121, 237, 223, 54];
+      name: "affiliate";
+      discriminator: [136, 95, 107, 149, 36, 195, 146, 35];
+    },
+    {
+      name: "affiliateMerchant";
+      discriminator: [188, 88, 40, 90, 229, 87, 157, 141];
     },
     {
       name: "merchant";
       discriminator: [71, 235, 30, 40, 231, 21, 32, 64];
-    },
-    {
-      name: "platform";
-      discriminator: [77, 92, 204, 58, 187, 98, 91, 12];
-    },
-    {
-      name: "referralLink";
-      discriminator: [30, 231, 159, 98, 189, 47, 48, 5];
     }
   ];
   errors: [
     {
       code: 6000;
-      name: "invalidFeeBasisPoints";
-      msg: "Fee basis points must be <= 10000";
+      name: "unauthorized";
+      msg: "You are not authorized to perform this action";
     },
     {
       code: 6001;
-      name: "nameTooLong";
-      msg: "Name too long";
+      name: "invalidCommissionRate";
+      msg: "Commission rate must be between 0 and 100";
     },
     {
       code: 6002;
-      name: "refCodeTooLong";
-      msg: "Referral code too long";
-    },
-    {
-      code: 6003;
-      name: "invalidAmount";
-      msg: "Invalid amount";
-    },
-    {
-      code: 6004;
-      name: "notPlatformAuthority";
-      msg: "Not platform authority";
-    },
-    {
-      code: 6005;
-      name: "notMerchantAuthority";
-      msg: "Not merchant authority";
-    },
-    {
-      code: 6006;
-      name: "notReferrer";
-      msg: "Not referrer";
-    },
-    {
-      code: 6007;
-      name: "invalidAffiliateProgramMerchant";
-      msg: "Invalid affiliate program merchant";
-    },
-    {
-      code: 6008;
-      name: "invalidReferralLinkAffiliateProgram";
-      msg: "Invalid referral link affiliate program";
-    },
-    {
-      code: 6009;
-      name: "invalidOwner";
-      msg: "Invalid token account owner";
-    },
-    {
-      code: 6010;
-      name: "inactiveMerchant";
-      msg: "Merchant is inactive";
-    },
-    {
-      code: 6011;
-      name: "inactiveAffiliateProgram";
-      msg: "Affiliate program is inactive";
-    },
-    {
-      code: 6012;
-      name: "inactiveReferralLink";
-      msg: "Referral link is inactive";
+      name: "merchantInactive";
+      msg: "Merchant is not active";
     }
   ];
   types: [
     {
-      name: "affiliateProgram";
+      name: "affiliate";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "authority";
+            type: "pubkey";
+          },
+          {
+            name: "name";
+            type: "string";
+          },
+          {
+            name: "totalCommission";
+            type: "u64";
+          },
+          {
+            name: "totalReferrals";
+            type: "u64";
+          },
+          {
+            name: "bump";
+            type: "u8";
+          }
+        ];
+      };
+    },
+    {
+      name: "affiliateMerchant";
       type: {
         kind: "struct";
         fields: [
@@ -433,16 +450,16 @@ export type Reflink = {
             type: "pubkey";
           },
           {
-            name: "name";
-            type: "string";
+            name: "affiliate";
+            type: "pubkey";
           },
           {
-            name: "referrerFeeBasisPoints";
-            type: "u16";
+            name: "commissionEarned";
+            type: "u64";
           },
           {
-            name: "isActive";
-            type: "bool";
+            name: "successfulReferrals";
+            type: "u64";
           },
           {
             name: "bump";
@@ -465,67 +482,19 @@ export type Reflink = {
             type: "string";
           },
           {
-            name: "isActive";
-            type: "bool";
-          },
-          {
-            name: "bump";
+            name: "commissionRate";
             type: "u8";
-          }
-        ];
-      };
-    },
-    {
-      name: "platform";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "authority";
-            type: "pubkey";
           },
           {
-            name: "feeBasisPoints";
-            type: "u16";
-          },
-          {
-            name: "bump";
-            type: "u8";
-          }
-        ];
-      };
-    },
-    {
-      name: "referralLink";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "affiliateProgram";
-            type: "pubkey";
-          },
-          {
-            name: "referrer";
-            type: "pubkey";
-          },
-          {
-            name: "code";
+            name: "websiteUrl";
             type: "string";
           },
           {
-            name: "clickCount";
+            name: "totalRevenue";
             type: "u64";
           },
           {
-            name: "conversionCount";
-            type: "u64";
-          },
-          {
-            name: "totalSales";
-            type: "u64";
-          },
-          {
-            name: "totalCommission";
+            name: "totalReferrals";
             type: "u64";
           },
           {

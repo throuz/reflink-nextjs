@@ -8,20 +8,60 @@
   },
   "instructions": [
     {
-      "name": "create_affiliate_program",
-      "discriminator": [98, 186, 216, 40, 40, 253, 210, 236],
+      "name": "join_merchant",
+      "discriminator": [222, 215, 177, 87, 139, 47, 221, 130],
       "accounts": [
         {
-          "name": "affiliate_program",
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "affiliate",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "merchant",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 101, 114, 99, 104, 97, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "merchant.authority",
+                "account": "Merchant"
+              }
+            ]
+          }
+        },
+        {
+          "name": "affiliate_merchant",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  97, 102, 102, 105, 108, 105, 97, 116, 101, 95, 112, 114, 111,
-                  103, 114, 97, 109
+                  97, 102, 102, 105, 108, 105, 97, 116, 101, 45, 109, 101, 114,
+                  99, 104, 97, 110, 116
                 ]
+              },
+              {
+                "kind": "account",
+                "path": "affiliate"
               },
               {
                 "kind": "account",
@@ -31,12 +71,85 @@
           }
         },
         {
-          "name": "merchant"
-        },
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "process_purchase",
+      "discriminator": [38, 233, 48, 62, 162, 120, 177, 244],
+      "accounts": [
         {
-          "name": "authority",
+          "name": "customer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "merchant",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 101, 114, 99, 104, 97, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "merchant.authority",
+                "account": "Merchant"
+              }
+            ]
+          }
+        },
+        {
+          "name": "affiliate",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
+              },
+              {
+                "kind": "account",
+                "path": "affiliate.authority",
+                "account": "Affiliate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "affiliate_merchant",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97, 102, 102, 105, 108, 105, 97, 116, 101, 45, 109, 101, 114,
+                  99, 104, 97, 110, 116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "affiliate"
+              },
+              {
+                "kind": "account",
+                "path": "merchant"
+              }
+            ]
+          }
+        },
+        {
+          "name": "merchant_authority",
+          "writable": true
+        },
+        {
+          "name": "affiliate_authority",
+          "writable": true
         },
         {
           "name": "system_program",
@@ -45,19 +158,57 @@
       ],
       "args": [
         {
-          "name": "program_name",
-          "type": "string"
-        },
-        {
-          "name": "referrer_fee_basis_points",
-          "type": "u16"
+          "name": "amount",
+          "type": "u64"
         }
       ]
     },
     {
-      "name": "create_merchant",
-      "discriminator": [249, 172, 245, 100, 32, 117, 97, 156],
+      "name": "register_affiliate",
+      "discriminator": [87, 121, 99, 184, 126, 63, 103, 217],
       "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "affiliate",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "register_merchant",
+      "discriminator": [238, 245, 77, 132, 161, 88, 216, 248],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
         {
           "name": "merchant",
           "writable": true,
@@ -75,55 +226,49 @@
           }
         },
         {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "merchant_name",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "commission_rate",
+          "type": "u8"
+        },
+        {
+          "name": "website_url",
           "type": "string"
         }
       ]
     },
     {
-      "name": "create_referral_link",
-      "discriminator": [246, 55, 144, 190, 86, 38, 25, 213],
+      "name": "update_affiliate",
+      "discriminator": [4, 8, 247, 126, 7, 112, 181, 99],
       "accounts": [
         {
-          "name": "referral_link",
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "affiliate",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  114, 101, 102, 101, 114, 114, 97, 108, 95, 108, 105, 110, 107
-                ]
+                "value": [97, 102, 102, 105, 108, 105, 97, 116, 101]
               },
               {
                 "kind": "account",
-                "path": "affiliate_program"
-              },
-              {
-                "kind": "account",
-                "path": "referrer"
+                "path": "authority"
               }
             ]
           }
-        },
-        {
-          "name": "affiliate_program"
-        },
-        {
-          "name": "referrer",
-          "writable": true,
-          "signer": true
         },
         {
           "name": "system_program",
@@ -132,266 +277,133 @@
       ],
       "args": [
         {
-          "name": "unique_code",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "increment_click",
-      "discriminator": [189, 6, 253, 63, 135, 146, 88, 65],
-      "accounts": [
-        {
-          "name": "referral_link",
-          "writable": true
-        },
-        {
-          "name": "authority",
-          "signer": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initialize_platform",
-      "discriminator": [119, 201, 101, 45, 75, 122, 89, 3],
-      "accounts": [
-        {
-          "name": "platform",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [112, 108, 97, 116, 102, 111, 114, 109]
-              }
-            ]
+          "name": "name",
+          "type": {
+            "option": "string"
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "update_merchant",
+      "discriminator": [192, 114, 143, 220, 199, 50, 234, 165],
+      "accounts": [
         {
           "name": "authority",
           "writable": true,
           "signer": true
         },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "platform_fee_basis_points",
-          "type": "u16"
-        }
-      ]
-    },
-    {
-      "name": "process_sale",
-      "discriminator": [103, 228, 248, 104, 78, 46, 193, 82],
-      "accounts": [
-        {
-          "name": "platform"
-        },
-        {
-          "name": "merchant"
-        },
-        {
-          "name": "affiliate_program"
-        },
-        {
-          "name": "referral_link",
-          "writable": true
-        },
-        {
-          "name": "buyer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "buyer_token_account",
-          "writable": true
-        },
-        {
-          "name": "merchant_token_account",
-          "writable": true
-        },
-        {
-          "name": "referrer_token_account",
-          "writable": true
-        },
-        {
-          "name": "platform_token_account",
-          "writable": true
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "toggle_affiliate_program_status",
-      "discriminator": [11, 194, 31, 217, 193, 188, 43, 239],
-      "accounts": [
-        {
-          "name": "affiliate_program",
-          "writable": true
-        },
-        {
-          "name": "merchant"
-        },
-        {
-          "name": "authority",
-          "signer": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "toggle_merchant_status",
-      "discriminator": [251, 186, 166, 45, 108, 107, 186, 170],
-      "accounts": [
         {
           "name": "merchant",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 101, 114, 99, 104, 97, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
         },
         {
-          "name": "authority",
-          "signer": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "toggle_referral_link_status",
-      "discriminator": [26, 73, 35, 181, 45, 41, 160, 31],
-      "accounts": [
-        {
-          "name": "referral_link",
-          "writable": true
-        },
-        {
-          "name": "authority",
-          "signer": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "update_platform_fee",
-      "discriminator": [162, 97, 186, 47, 93, 113, 176, 243],
-      "accounts": [
-        {
-          "name": "platform",
-          "writable": true
-        },
-        {
-          "name": "authority",
-          "signer": true
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "new_fee_basis_points",
-          "type": "u16"
+          "name": "name",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "commission_rate",
+          "type": {
+            "option": "u8"
+          }
+        },
+        {
+          "name": "website_url",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "is_active",
+          "type": {
+            "option": "bool"
+          }
         }
       ]
     }
   ],
   "accounts": [
     {
-      "name": "AffiliateProgram",
-      "discriminator": [101, 106, 6, 88, 121, 237, 223, 54]
+      "name": "Affiliate",
+      "discriminator": [136, 95, 107, 149, 36, 195, 146, 35]
+    },
+    {
+      "name": "AffiliateMerchant",
+      "discriminator": [188, 88, 40, 90, 229, 87, 157, 141]
     },
     {
       "name": "Merchant",
       "discriminator": [71, 235, 30, 40, 231, 21, 32, 64]
-    },
-    {
-      "name": "Platform",
-      "discriminator": [77, 92, 204, 58, 187, 98, 91, 12]
-    },
-    {
-      "name": "ReferralLink",
-      "discriminator": [30, 231, 159, 98, 189, 47, 48, 5]
     }
   ],
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidFeeBasisPoints",
-      "msg": "Fee basis points must be <= 10000"
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action"
     },
     {
       "code": 6001,
-      "name": "NameTooLong",
-      "msg": "Name too long"
+      "name": "InvalidCommissionRate",
+      "msg": "Commission rate must be between 0 and 100"
     },
     {
       "code": 6002,
-      "name": "RefCodeTooLong",
-      "msg": "Referral code too long"
-    },
-    {
-      "code": 6003,
-      "name": "InvalidAmount",
-      "msg": "Invalid amount"
-    },
-    {
-      "code": 6004,
-      "name": "NotPlatformAuthority",
-      "msg": "Not platform authority"
-    },
-    {
-      "code": 6005,
-      "name": "NotMerchantAuthority",
-      "msg": "Not merchant authority"
-    },
-    {
-      "code": 6006,
-      "name": "NotReferrer",
-      "msg": "Not referrer"
-    },
-    {
-      "code": 6007,
-      "name": "InvalidAffiliateProgramMerchant",
-      "msg": "Invalid affiliate program merchant"
-    },
-    {
-      "code": 6008,
-      "name": "InvalidReferralLinkAffiliateProgram",
-      "msg": "Invalid referral link affiliate program"
-    },
-    {
-      "code": 6009,
-      "name": "InvalidOwner",
-      "msg": "Invalid token account owner"
-    },
-    {
-      "code": 6010,
-      "name": "InactiveMerchant",
-      "msg": "Merchant is inactive"
-    },
-    {
-      "code": 6011,
-      "name": "InactiveAffiliateProgram",
-      "msg": "Affiliate program is inactive"
-    },
-    {
-      "code": 6012,
-      "name": "InactiveReferralLink",
-      "msg": "Referral link is inactive"
+      "name": "MerchantInactive",
+      "msg": "Merchant is not active"
     }
   ],
   "types": [
     {
-      "name": "AffiliateProgram",
+      "name": "Affiliate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "total_commission",
+            "type": "u64"
+          },
+          {
+            "name": "total_referrals",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AffiliateMerchant",
       "type": {
         "kind": "struct",
         "fields": [
@@ -400,16 +412,16 @@
             "type": "pubkey"
           },
           {
-            "name": "name",
-            "type": "string"
+            "name": "affiliate",
+            "type": "pubkey"
           },
           {
-            "name": "referrer_fee_basis_points",
-            "type": "u16"
+            "name": "commission_earned",
+            "type": "u64"
           },
           {
-            "name": "is_active",
-            "type": "bool"
+            "name": "successful_referrals",
+            "type": "u64"
           },
           {
             "name": "bump",
@@ -432,67 +444,19 @@
             "type": "string"
           },
           {
-            "name": "is_active",
-            "type": "bool"
-          },
-          {
-            "name": "bump",
+            "name": "commission_rate",
             "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Platform",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "pubkey"
           },
           {
-            "name": "fee_basis_points",
-            "type": "u16"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ReferralLink",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "affiliate_program",
-            "type": "pubkey"
-          },
-          {
-            "name": "referrer",
-            "type": "pubkey"
-          },
-          {
-            "name": "code",
+            "name": "website_url",
             "type": "string"
           },
           {
-            "name": "click_count",
+            "name": "total_revenue",
             "type": "u64"
           },
           {
-            "name": "conversion_count",
-            "type": "u64"
-          },
-          {
-            "name": "total_sales",
-            "type": "u64"
-          },
-          {
-            "name": "total_commission",
+            "name": "total_referrals",
             "type": "u64"
           },
           {
