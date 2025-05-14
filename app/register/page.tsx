@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import {
   useRegisterMerchant,
   useRegisterAffiliate,
+  useUserRole,
 } from "@/components/counter/hooks/useReflink";
 
 type Role = "merchant" | "affiliate" | null;
@@ -18,6 +19,7 @@ export default function Register() {
   const router = useRouter();
   const { toast } = useToast();
   const { connected } = useWallet();
+  const { data: userRole, isLoading } = useUserRole();
   const [role, setRole] = useState<Role>(null);
   const [name, setName] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
@@ -25,6 +27,24 @@ export default function Register() {
 
   const registerMerchant = useRegisterMerchant();
   const registerAffiliate = useRegisterAffiliate();
+
+  useEffect(() => {
+    if (!isLoading && userRole) {
+      if (userRole.isMerchant) {
+        router.replace("/dashboard/merchant");
+      } else if (userRole.isAffiliate) {
+        router.replace("/dashboard/affiliate");
+      }
+    }
+  }, [isLoading, userRole, router]);
+
+  // Show nothing while loading or redirecting
+  if (
+    isLoading ||
+    (userRole && (userRole.isMerchant || userRole.isAffiliate))
+  ) {
+    return null;
+  }
 
   const handleMerchantSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
